@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import thumbtack.school.step3.User;
 import thumbtack.school.step3.dao.Dao;
 
-import java.io.IOException;
-
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +18,7 @@ public class TrackerService {
     private Dao dao;
 
     @Async
-    public void track(String userId, String ipAddress, HttpHeaders headers) throws IOException {
+    public void track(String userId, String ipAddress, HttpHeaders headers) {
         User user = new User(userId, ipAddress, headers);
         dao.put(user);
     }

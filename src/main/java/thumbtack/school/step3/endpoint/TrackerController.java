@@ -12,7 +12,6 @@ import thumbtack.school.step3.service.TrackerService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -24,7 +23,7 @@ public class TrackerController {
     @GetMapping(value = "/img")
     public ResponseEntity<byte[]> getPixel(@CookieValue(value = "userId", required = false) String userId,
                                            @RequestHeader HttpHeaders headers,
-                                           HttpServletResponse response, HttpServletRequest request) throws IOException {
+                                           HttpServletResponse response, HttpServletRequest request) {
         if (userId == null) {
             return redirect(response);
         }

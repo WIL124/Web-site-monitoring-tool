@@ -8,8 +8,6 @@ import thumbtack.school.step3.User;
 import thumbtack.school.step3.dao.Dao;
 import thumbtack.school.step3.repo.UserTrackerRepository;
 
-import java.io.IOException;
-
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +21,7 @@ public class DaoImpl implements Dao {
     }
 
     @Override
-    public void put(User user) throws IOException {
+    public void put(User user) {
         repository.put(user);
     }
 
