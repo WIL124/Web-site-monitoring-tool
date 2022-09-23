@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Configuration
@@ -21,7 +22,7 @@ public class AppConfig {
         return ConnectionFactory.createAsyncConnection(new org.apache.hadoop.conf.Configuration());
     }
     @Bean
-    public Executor taskExecutor() {
+    public ExecutorService taskExecutor() {
         return Executors.newCachedThreadPool();
     }
 }

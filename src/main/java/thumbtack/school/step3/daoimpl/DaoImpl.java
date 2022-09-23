@@ -8,6 +8,8 @@ import thumbtack.school.step3.User;
 import thumbtack.school.step3.dao.Dao;
 import thumbtack.school.step3.repo.UserTrackerRepository;
 
+import java.util.List;
+
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,5 +30,10 @@ public class DaoImpl implements Dao {
     @Override
     public void put(User user, long ts) {
 
+    }
+
+    @Override
+    public List<User> getAll() {
+        return repository.getAll();
     }
 }
