@@ -8,9 +8,9 @@ import thumbtack.school.step3.repo.UserTrackerRepository;
 @SpringBootTest
 class Step3ApplicationTests {
     @Autowired
-    UserTrackerRepository userTrackerRepository;
+    UserTrackerRepository repository;
     @Test
     void contextLoads() {
-        userTrackerRepository.getAll();
+        repository.getAll();
     }
 }
