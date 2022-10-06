@@ -12,6 +12,11 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>step3</name>
     <description>step3</description>
+    <packaging>pom</packaging>
+    <modules>
+        <module>tracking</module>
+        <module>monitoring</module>
+    </modules>
     <properties>
         <java.version>8</java.version>
     </properties>
@@ -74,6 +79,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
             </plugin>
         </plugins>
     </build>
