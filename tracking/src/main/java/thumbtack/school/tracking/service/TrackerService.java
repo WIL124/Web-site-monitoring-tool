@@ -6,20 +6,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.model.User;
-import thumbtack.school.tracking.dao.Dao;
+
+import java.util.concurrent.ExecutionException;
 
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
 @Async
 public class TrackerService {
+    private static final String TABLE_NAME = "userTracker";
     @Autowired
-    private Dao dao;
+    private HbaseDao hbaseDao;
 
     @Async
     public void track(String userId, String ipAddress, HttpHeaders headers) {
         User user = new User(userId, ipAddress, headers);
-        dao.put(user);
+        hbaseDao.put(TABLE_NAME, user);
+    }
+
+    public void createTable(String tableName) throws ExecutionException, InterruptedException {
+        hbaseDao.createTable(tableName);
     }
 }
