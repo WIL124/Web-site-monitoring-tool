@@ -10,5 +10,5 @@ public interface HbaseDao {
 
     void put(String tableName, User user);
 
-    List<User> getAll(String tableName);
+    List<User> getAllUsers(String tableName);
 }

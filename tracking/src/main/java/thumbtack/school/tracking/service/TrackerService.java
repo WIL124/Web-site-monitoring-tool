@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.model.User;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -22,7 +24,8 @@ public class TrackerService {
 
     @Async
     public void track(String userId, String ipAddress, HttpHeaders headers) {
-        User user = new User(userId, ipAddress, headers);
+        headers.add("IP address", ipAddress);
+        User user = new User(userId, new HashMap<>(Collections.singletonMap(System.currentTimeMillis(), headers)));
         hbaseDao.put(TABLE_NAME, user);
     }
 

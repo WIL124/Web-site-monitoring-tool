@@ -27,7 +27,6 @@ public class HbaseDaoImpl implements HbaseDao {
     @Autowired
     private HbaseRepository repository;
     private static final String COLUMN_FAMILY_NAME = "data";
-    private static final String IP_ADDRESS_COLUMN_NAME = "IP ADDRESS";
 
     @Override
     public void createTable(String tableName) throws ExecutionException, InterruptedException {
@@ -44,10 +43,9 @@ public class HbaseDaoImpl implements HbaseDao {
     public void put(String tableName, User user) {
         CompletableFuture<Put> putCompletableFuture = CompletableFuture.supplyAsync(() -> {
             Put put = new Put(toBytes(user.getId()));
-            user.getHeaders()
-                    .forEach((name, values) -> values
-                            .forEach(value -> put.addColumn(toBytes(COLUMN_FAMILY_NAME), toBytes(name), toBytes(value))));
-            put.addColumn(toBytes(COLUMN_FAMILY_NAME), toBytes(IP_ADDRESS_COLUMN_NAME), toBytes(user.getIpAddress()));
+            user.getTimestampHeadersMap().values().forEach(
+                    header -> header.forEach((name, values) ->
+                            values.forEach(value -> put.addColumn(toBytes(COLUMN_FAMILY_NAME), toBytes(name), toBytes(value)))));
             return put;
         });
         repository.put(TableName.valueOf(tableName), putCompletableFuture);
@@ -55,7 +53,7 @@ public class HbaseDaoImpl implements HbaseDao {
 
 
     @Override
-    public List<User> getAll(String tableName) {
+    public List<User> getAllUsers(String tableName) {
         List<User> users = new ArrayList<>();
         CompletableFuture<List<Result>> cfResults = repository.getAll(TableName.valueOf(tableName));
         try {

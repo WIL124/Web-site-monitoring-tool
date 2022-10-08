@@ -28,7 +28,7 @@ public class HbaseRepository {
     public CompletableFuture<List<Result>> getAll(TableName tableName) {
         CompletableFuture<AsyncTable<AdvancedScanResultConsumer>> tableFuture =
                 asyncConnection.thenApply(connection -> connection.getTable(tableName));
-        return tableFuture.thenCompose(table -> table.scanAll(new Scan()));
+        return tableFuture.thenCompose(table -> table.scanAll(new Scan().readAllVersions()));
     }
 
     public void createTable(TableDescriptor tableDescriptor, TableName tableName) throws ExecutionException, InterruptedException {

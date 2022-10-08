@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpHeaders;
+
+import java.util.Map;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class User {
     private String id;
-    private String ipAddress;
-    private HttpHeaders headers;
+    private Map<Long, HttpHeaders> timestampHeadersMap; //map of user's sessions
 }

@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import thumbtack.school.reporter.service.ReporterServiceImpl;
 
+import java.time.LocalDateTime;
+
 @RestController
 @AllArgsConstructor
 public class ReporterEndpointImpl {
@@ -12,6 +14,6 @@ public class ReporterEndpointImpl {
 
     @GetMapping
     public void moveDataFromHbaseToPostgres() {
-        service.getReport();
+        service.getReport(LocalDateTime.now());
     }
 }
