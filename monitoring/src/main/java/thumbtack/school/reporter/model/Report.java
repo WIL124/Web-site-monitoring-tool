@@ -1,14 +1,21 @@
 package thumbtack.school.reporter.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class Report {
     LocalDateTime dateTime;
-    long users;
-    long visits;
+    long users = 0;
+    long visits = 0;
+    Map<String, Long> languageMap = new HashMap<>();
+    Map<String, Long> osMap = new HashMap<>();
+    Map<String, Long> platformMap = new HashMap<>();
+    Map<String, Long> browserMap = new HashMap<>();
+    Map<String, Long> regionMap = new HashMap<>();
 }
