@@ -11,4 +11,5 @@ public interface HbaseDao {
     void put(String tableName, User user);
 
     List<User> getAllUsers(String tableName);
+    List<User> getAllUsersWithTimeRange(String tableName, long minRange, long maxRange);
 }

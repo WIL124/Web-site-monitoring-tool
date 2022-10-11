@@ -8,5 +8,5 @@ public interface ReporterService {
     /**
      * Create and download report from hbase to postgres for dateTime
      */
-    Report getReport(LocalDateTime dateTime);
+    Report getReport(long tsFrom, long tsTo);
 }

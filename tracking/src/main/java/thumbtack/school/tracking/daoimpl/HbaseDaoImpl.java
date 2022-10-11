@@ -64,4 +64,17 @@ public class HbaseDaoImpl implements HbaseDao {
         }
         return users;
     }
+
+    @Override
+    public List<User> getAllUsersWithTimeRange(String tableName, long minRange, long maxRange) {
+        List<User> users = new ArrayList<>();
+        CompletableFuture<List<Result>> cfResults = repository.getAllWithTimeRange(TableName.valueOf(tableName), minRange, maxRange);
+        try {
+            cfResults.get().parallelStream().forEach(result ->
+                    users.add(userMapper.fromResult(result)));
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
+    }
 }

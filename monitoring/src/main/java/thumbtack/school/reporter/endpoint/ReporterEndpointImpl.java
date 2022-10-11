@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReporterEndpointImpl {
     ReporterServiceImpl service;
-
     @GetMapping
     public void moveDataFromHbaseToPostgres() {
-        service.getReport(LocalDateTime.now());
+        service.getReport(0, Long.MAX_VALUE);
     }
 }

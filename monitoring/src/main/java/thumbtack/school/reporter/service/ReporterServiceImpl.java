@@ -5,14 +5,12 @@ import eu.bitwalker.useragentutils.DeviceType;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.model.Report;
 import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.model.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -21,14 +19,12 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class ReporterServiceImpl implements ReporterService {
-    private static final String TABLE_NAME = "userTracker";
-    @Autowired
     private HbaseDao hbaseDao;
-
-
+    private GeolocationService geolocationService;
+    private static final String TABLE_NAME = "userTracker";
     @Override
-    public Report getReport(LocalDateTime dateTime) { //TODO need dateTime filter (on hbase scan)
-        List<User> users = hbaseDao.getAllUsers(TABLE_NAME);
+    public Report getReport(long timestampFrom, long timestampTo) {
+        List<User> users = hbaseDao.getAllUsersWithTimeRange(TABLE_NAME, 0, Long.MAX_VALUE);
         //        Future<Map<String, Long>> browserMap = executor.submit(() -> getLanguageMap(users));
         Report report = createReport(users);
         return report;
@@ -42,6 +38,7 @@ public class ReporterServiceImpl implements ReporterService {
             Map<Long, HttpHeaders> timestampHeadersMap = user.getTimestampHeadersMap();
             for (HttpHeaders httpHeaders : timestampHeadersMap.values()) {
                 accumulateLanguageData(httpHeaders, report.getLanguageMap());
+                accumulateRegionData(httpHeaders, report.getRegionMap());
                 Optional<String> userAgentString = Optional.ofNullable(httpHeaders.getFirst("User-Agent"));
                 if (userAgentString.isPresent()) {
                     UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString.get());
@@ -79,6 +76,11 @@ public class ReporterServiceImpl implements ReporterService {
         if (headers.getAcceptLanguage().isEmpty()) return;
         Optional<Locale> optionalLocale = headers.getAcceptLanguageAsLocales().stream().findFirst();
         optionalLocale.ifPresent(locale -> languageMap.merge(locale.getLanguage(), 1L, Long::sum));
+    }
+    private void accumulateRegionData(HttpHeaders headers, Map<String, Long> countryMap) {
+        if (headers.getOrEmpty("ipAddress").isEmpty()) return;
+        String country = geolocationService.getCountryFromIP(headers.getFirst("ipAddress"));
+        countryMap.merge(country, 1L, Long::sum);
     }
 
 //    private Map<String, Long> getLanguageMap(List<User> users) {

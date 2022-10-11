@@ -8,6 +8,7 @@ import org.apache.hadoop.hbase.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -28,13 +29,28 @@ public class HbaseRepository {
     public CompletableFuture<List<Result>> getAll(TableName tableName) {
         CompletableFuture<AsyncTable<AdvancedScanResultConsumer>> tableFuture =
                 asyncConnection.thenApply(connection -> connection.getTable(tableName));
-        return tableFuture.thenCompose(table -> table.scanAll(new Scan().readAllVersions()));
+        return tableFuture.thenCompose(table -> table.scanAll(fullScan()));
+    }
+    public CompletableFuture<List<Result>> getAllWithTimeRange(TableName tableName, long minRange, long maxRange) {
+        CompletableFuture<AsyncTable<AdvancedScanResultConsumer>> tableFuture =
+                asyncConnection.thenApply(connection -> connection.getTable(tableName));
+        return tableFuture.thenCompose(table -> table.scanAll(fullScanWithTimeRange(minRange, maxRange)));
     }
 
     public void createTable(TableDescriptor tableDescriptor, TableName tableName) throws ExecutionException, InterruptedException {
         AsyncAdmin asyncAdmin = asyncConnection.get().getAdmin();
         if (!asyncAdmin.tableExists(tableName).get()) {
             asyncAdmin.createTable(tableDescriptor);
+        }
+    }
+    private Scan fullScan(){
+        return new Scan().readAllVersions();
+    }
+    private Scan fullScanWithTimeRange(long min, long max){
+        try {
+            return fullScan().setTimeRange(min, max);
+        } catch (IOException e) { 
+            throw new RuntimeException(e);
         }
     }
 }
