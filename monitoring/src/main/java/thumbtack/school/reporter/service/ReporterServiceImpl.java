@@ -1,20 +1,17 @@
 package thumbtack.school.reporter.service;
 
-import eu.bitwalker.useragentutils.Browser;
-import eu.bitwalker.useragentutils.DeviceType;
-import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import thumbtack.school.reporter.model.Report;
+import thumbtack.school.reporter.model.SessionReport;
 import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -22,66 +19,94 @@ public class ReporterServiceImpl implements ReporterService {
     private HbaseDao hbaseDao;
     private GeolocationService geolocationService;
     private static final String TABLE_NAME = "userTracker";
+    private static final String IP_ADDRESS_HEADER_NAME = "IP address";
+
     @Override
-    public Report getReport(long timestampFrom, long timestampTo) {
+    public List<SessionReport> getReport(long timestampFrom, long timestampTo) {
         List<User> users = hbaseDao.getAllUsersWithTimeRange(TABLE_NAME, 0, Long.MAX_VALUE);
         //        Future<Map<String, Long>> browserMap = executor.submit(() -> getLanguageMap(users));
-        Report report = createReport(users);
-        return report;
+        return users.stream()
+                .map(this::createUserReports)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 
-    private Report createReport(List<User> users) {
-        Report report = new Report();
-        report.setUsers(users.size());
-        report.setVisits(users.stream().mapToLong(user -> user.getTimestampHeadersMap().size()).sum());
-        for (User user : users) {
-            Map<Long, HttpHeaders> timestampHeadersMap = user.getTimestampHeadersMap();
-            for (HttpHeaders httpHeaders : timestampHeadersMap.values()) {
-                accumulateLanguageData(httpHeaders, report.getLanguageMap());
-                accumulateRegionData(httpHeaders, report.getRegionMap());
-                Optional<String> userAgentString = Optional.ofNullable(httpHeaders.getFirst("User-Agent"));
-                if (userAgentString.isPresent()) {
-                    UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString.get());
-                    accumulateBrowserData(userAgent, report.getBrowserMap());
-                    accumulateOsData(userAgent, report.getOsMap());
-                    accumulatePlatformData(userAgent, report.getPlatformMap());
-                }
+    private List<SessionReport> createUserReports(User user) {
+        List<SessionReport> reports = new ArrayList<>();
+        for (Map.Entry<Long, HttpHeaders> timestampHeadersEntry : user.getTimestampHeadersMap().entrySet()) {
+            HttpHeaders headers = timestampHeadersEntry.getValue();
+
+            String language = headers.getFirst(HttpHeaders.ACCEPT_LANGUAGE);
+            String region = geolocationService.getCountryFromIP(headers.getFirst(IP_ADDRESS_HEADER_NAME));
+            String os = null, platform = null;
+            if (headers.getFirst(HttpHeaders.USER_AGENT) != null) {
+                UserAgent userAgent = UserAgent.parseUserAgentString(headers.getFirst(HttpHeaders.USER_AGENT));
+                os = userAgent.getOperatingSystem().getName();
+                platform = userAgent.getOperatingSystem().getDeviceType().getName();
             }
+            long ts = timestampHeadersEntry.getKey();
+            reports.add(SessionReport.builder().timestamp(ts).language(language).region(region).os(os).platform(platform).user(user).build());
         }
-        return report;
+        return reports;
     }
 
-    private void accumulatePlatformData(UserAgent userAgent, Map<String, Long> platformMap) {
-        DeviceType deviceType = userAgent.getOperatingSystem().getDeviceType();
-        platformMap.merge(deviceType.getName(), 1L, Long::sum);
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////DEPRECATED//////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void accumulateBrowserData(UserAgent userAgent, Map<String, Long> browserMap) {
-        Browser browser = userAgent.getBrowser();
-        while (!browser.equals(browser.getGroup())) {  //get largest Browser group
-            browser = browser.getGroup();
-        }
-        browserMap.merge(browser.getName(), 1L, Long::sum);
-    }
-
-    private void accumulateOsData(UserAgent userAgent, Map<String, Long> osMap) {
-        OperatingSystem os = userAgent.getOperatingSystem();
-        while (!os.equals(os.getGroup())) {  //get largest OS group
-            os = os.getGroup();
-        }
-        osMap.merge(os.getName(), 1L, Long::sum);
-    }
-
-    private void accumulateLanguageData(HttpHeaders headers, Map<String, Long> languageMap) {
-        if (headers.getAcceptLanguage().isEmpty()) return;
-        Optional<Locale> optionalLocale = headers.getAcceptLanguageAsLocales().stream().findFirst();
-        optionalLocale.ifPresent(locale -> languageMap.merge(locale.getLanguage(), 1L, Long::sum));
-    }
-    private void accumulateRegionData(HttpHeaders headers, Map<String, Long> countryMap) {
-        if (headers.getOrEmpty("ipAddress").isEmpty()) return;
-        String country = geolocationService.getCountryFromIP(headers.getFirst("ipAddress"));
-        countryMap.merge(country, 1L, Long::sum);
-    }
+//    private SessionReport createUserReports(List<User> users) {
+//        SessionReport sessionReport = new SessionReport();
+//        sessionReport.setUsers(users.size());
+//        sessionReport.setVisits(users.stream().mapToLong(user -> user.getTimestampHeadersMap().size()).sum());
+//        for (User user : users) {
+//            Map<Long, HttpHeaders> timestampHeadersMap = user.getTimestampHeadersMap();
+//            for (HttpHeaders httpHeaders : timestampHeadersMap.values()) {
+//                accumulateLanguageData(httpHeaders, sessionReport.getLanguageMap());
+//                accumulateRegionData(httpHeaders, sessionReport.getRegionMap());
+//                Optional<String> userAgentString = Optional.ofNullable(httpHeaders.getFirst("User-Agent"));
+//                if (userAgentString.isPresent()) {
+//                    UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString.get());
+//                    accumulateBrowserData(userAgent, sessionReport.getBrowserMap());
+//                    accumulateOsData(userAgent, sessionReport.getOsMap());
+//                    accumulatePlatformData(userAgent, sessionReport.getPlatformMap());
+//                }
+//            }
+//        }
+//        return sessionReport;
+//    }
+//
+//    private void accumulatePlatformData(UserAgent userAgent, Map<String, Long> platformMap) {
+//        DeviceType deviceType = userAgent.getOperatingSystem().getDeviceType();
+//        platformMap.merge(deviceType.getName(), 1L, Long::sum);
+//    }
+//
+//    private void accumulateBrowserData(UserAgent userAgent, Map<String, Long> browserMap) {
+//        Browser browser = userAgent.getBrowser();
+//        while (!browser.equals(browser.getGroup())) {  //get largest Browser group
+//            browser = browser.getGroup();
+//        }
+//        browserMap.merge(browser.getName(), 1L, Long::sum);
+//    }
+//
+//    private void accumulateOsData(UserAgent userAgent, Map<String, Long> osMap) {
+//        OperatingSystem os = userAgent.getOperatingSystem();
+//        while (!os.equals(os.getGroup())) {  //get largest OS group
+//            os = os.getGroup();
+//        }
+//        osMap.merge(os.getName(), 1L, Long::sum);
+//    }
+//
+//    private void accumulateLanguageData(HttpHeaders headers, Map<String, Long> languageMap) {
+//        if (headers.getAcceptLanguage().isEmpty()) return;
+//        Optional<Locale> optionalLocale = headers.getAcceptLanguageAsLocales().stream().findFirst();
+//        optionalLocale.ifPresent(locale -> languageMap.merge(locale.getLanguage(), 1L, Long::sum));
+//    }
+//
+//    private void accumulateRegionData(HttpHeaders headers, Map<String, Long> countryMap) {
+//        if (headers.getOrEmpty("ipAddress").isEmpty()) return;
+//        String country = geolocationService.getCountryFromIP(headers.getFirst("ipAddress"));
+//        countryMap.merge(country, 1L, Long::sum);
+//    }
 
 //    private Map<String, Long> getLanguageMap(List<User> users) {
 //        Map<String, Long> map = new HashMap<>();

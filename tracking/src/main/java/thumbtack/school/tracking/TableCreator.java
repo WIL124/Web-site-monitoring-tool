@@ -21,7 +21,7 @@ public class TableCreator implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws ExecutionException, InterruptedException {
-        log.info("Start TableCreator");
+        log.debug("Start TableCreator");
         service.createTable(TABLE_NAME);
     }
 }

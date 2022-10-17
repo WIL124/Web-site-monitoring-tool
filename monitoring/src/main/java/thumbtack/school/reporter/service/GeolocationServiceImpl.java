@@ -22,9 +22,9 @@ public class GeolocationServiceImpl implements GeolocationService {
     public String getCountryFromIP(String ipAddress) {
         IpLocationModel ipLocationModel;
         try {
-            ipLocationModel = objectMapper.readValue(ipLocationDao.getResponse(ipAddress).getBody(), IpLocationModel.class);
+            ipLocationModel = objectMapper.readValue(ipLocationDao.getResponseWithJson(ipAddress).getBody(), IpLocationModel.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            return "unknown"; //todo
         }
         if (ipLocationModel == null) return "unknown";
         return ipLocationModel.getCountry_name() == null ? "unknown" : ipLocationModel.getCountry_name();

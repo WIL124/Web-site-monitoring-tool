@@ -1,12 +1,12 @@
 package thumbtack.school.reporter.service;
 
-import thumbtack.school.reporter.model.Report;
+import thumbtack.school.reporter.model.SessionReport;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ReporterService {
     /**
      * Create and download report from hbase to postgres for dateTime
      */
-    Report getReport(long tsFrom, long tsTo);
+    List<SessionReport> getReport(long tsFrom, long tsTo);
 }

@@ -49,7 +49,7 @@ public class HbaseRepository {
     private Scan fullScanWithTimeRange(long min, long max){
         try {
             return fullScan().setTimeRange(min, max);
-        } catch (IOException e) { 
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

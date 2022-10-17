@@ -11,20 +11,20 @@ import thumbtack.school.tracking.model.User;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutionException; 
 
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
-@Async
 public class TrackerService {
     private static final String TABLE_NAME = "userTracker";
+    private static final String IP_ADDRESS_HEADER_NAME = "IP address";
     @Autowired
     private HbaseDao hbaseDao;
 
     @Async
     public void track(String userId, String ipAddress, HttpHeaders headers) {
-        headers.add("IP address", ipAddress);
+        headers.add(IP_ADDRESS_HEADER_NAME, ipAddress);
         User user = new User(userId, new HashMap<>(Collections.singletonMap(System.currentTimeMillis(), headers)));
         hbaseDao.put(TABLE_NAME, user);
     }
