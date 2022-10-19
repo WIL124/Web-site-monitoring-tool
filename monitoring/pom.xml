@@ -27,5 +27,10 @@
             <artifactId>geoip2</artifactId>
             <version>3.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>2.6.4</version>
+        </dependency>
     </dependencies>
 </project>

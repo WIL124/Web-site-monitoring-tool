@@ -1,16 +1,22 @@
-package thumbtack.school.reporter.service;
+package thumbtack.school.reporter.service.impl;
 
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.model.SessionReport;
+import thumbtack.school.reporter.model.statistic.BrowserStatistic;
+import thumbtack.school.reporter.model.statistic.CountryStatistic;
+import thumbtack.school.reporter.service.GeolocationService;
+import thumbtack.school.reporter.service.ReporterService;
 import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.model.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,18 +30,60 @@ public class ReporterServiceImpl implements ReporterService {
     @Override
     public List<SessionReport> getReport(long timestampFrom, long timestampTo) {
         List<User> users = hbaseDao.getAllUsersWithTimeRange(TABLE_NAME, 0, Long.MAX_VALUE);
-        //        Future<Map<String, Long>> browserMap = executor.submit(() -> getLanguageMap(users));
+
+        CompletableFuture<BrowserStatistic> browserStatisticCf = CompletableFuture
+                .supplyAsync(() -> users.stream()
+                        .map(this::getUserAgentsFromUser)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList())
+                ).thenApply(this::getBrowserStatistic);
+
+        CompletableFuture<CountryStatistic> countryStatisticCf = CompletableFuture
+                .supplyAsync(() -> users.stream()
+                        .map(this::getIpAddressesFromUser)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList())
+                ).thenApply(this::getCountryStatistic);
+
         return users.stream()
                 .map(this::createUserReports)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
 
+    private List<UserAgent> getUserAgentsFromUser(User user) {
+        return user.getTimestampHeadersMap().values().stream()
+                .map(headers -> headers.getFirst("user-agent"))
+                .map(UserAgent::parseUserAgentString).collect(Collectors.toList());
+    }
+    private List<String> getIpAddressesFromUser(User user){
+        return user.getTimestampHeadersMap().values().stream()
+                .map(headers -> headers.getFirst(IP_ADDRESS_HEADER_NAME))
+                .collect(Collectors.toList());
+    }
+
+    private BrowserStatistic getBrowserStatistic(List<UserAgent> userAgentList) {
+        Map<String, Integer> map = new HashMap<>();
+        for (UserAgent userAgent : userAgentList) {
+            map.merge(userAgent.getBrowser().getName(), 1, Integer::sum);
+        }
+        return new BrowserStatistic(map);
+    }
+
+    private CountryStatistic getCountryStatistic(List<String> ipAddressList) {
+        Map<String, Integer> map = new HashMap<>();
+        for (String ipAddress : ipAddressList) {
+            map.merge(geolocationService.getCountryFromIP(ipAddress), 1, Integer::sum);
+        }
+        return new CountryStatistic(map);
+    }
+
+
+    ////////////////////////deprecated too////////////////////
     private List<SessionReport> createUserReports(User user) {
         List<SessionReport> reports = new ArrayList<>();
         for (Map.Entry<Long, HttpHeaders> timestampHeadersEntry : user.getTimestampHeadersMap().entrySet()) {
             HttpHeaders headers = timestampHeadersEntry.getValue();
-
             String language = headers.getFirst(HttpHeaders.ACCEPT_LANGUAGE);
             String region = geolocationService.getCountryFromIP(headers.getFirst(IP_ADDRESS_HEADER_NAME));
             String os = null, platform = null;

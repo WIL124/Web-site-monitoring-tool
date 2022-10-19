@@ -1,4 +1,4 @@
-package thumbtack.school.reporter.service;
+package thumbtack.school.reporter.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.dao.IpLocationDao;
 import thumbtack.school.reporter.model.IpLocationModel;
+import thumbtack.school.reporter.service.GeolocationService;
 
 @Service
 @AllArgsConstructor

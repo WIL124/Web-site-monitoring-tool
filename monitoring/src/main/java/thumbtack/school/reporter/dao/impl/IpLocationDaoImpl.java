@@ -1,4 +1,4 @@
-package thumbtack.school.reporter.daoImpl;
+package thumbtack.school.reporter.dao.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpEntity;
