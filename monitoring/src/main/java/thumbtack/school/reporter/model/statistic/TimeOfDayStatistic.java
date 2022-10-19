@@ -5,13 +5,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class CountryStatistic {
+public class TimeOfDayStatistic {
     private long id;
-    private String name;
+    private int hour;
     private long count;
     private LocalDateTime createdAt;
-    public CountryStatistic(String name, long count) {
-        this.name = name;
+    public TimeOfDayStatistic(int hour, long count) {
+        this.hour = hour;
         this.count = count;
     }
 }

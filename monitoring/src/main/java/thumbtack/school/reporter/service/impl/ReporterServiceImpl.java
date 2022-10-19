@@ -2,21 +2,17 @@ package thumbtack.school.reporter.service.impl;
 
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import thumbtack.school.reporter.model.SessionReport;
-import thumbtack.school.reporter.model.statistic.BrowserStatistic;
-import thumbtack.school.reporter.model.statistic.CountryStatistic;
+import thumbtack.school.reporter.model.statistic.*;
 import thumbtack.school.reporter.service.GeolocationService;
 import thumbtack.school.reporter.service.ReporterService;
 import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.DayOfWeek;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,26 +24,88 @@ public class ReporterServiceImpl implements ReporterService {
     private static final String IP_ADDRESS_HEADER_NAME = "IP address";
 
     @Override
-    public List<SessionReport> getReport(long timestampFrom, long timestampTo) {
+    public void getReport(long timestampFrom, long timestampTo) {
         List<User> users = hbaseDao.getAllUsersWithTimeRange(TABLE_NAME, 0, Long.MAX_VALUE);
 
-        CompletableFuture<BrowserStatistic> browserStatisticCf = CompletableFuture
+        CompletableFuture<List<BrowserStatistic>> browserCf = CompletableFuture
                 .supplyAsync(() -> users.stream()
                         .map(this::getUserAgentsFromUser)
                         .flatMap(List::stream)
                         .collect(Collectors.toList())
                 ).thenApply(this::getBrowserStatistic);
 
-        CompletableFuture<CountryStatistic> countryStatisticCf = CompletableFuture
+        CompletableFuture<List<CountryStatistic>> countryCf = CompletableFuture
                 .supplyAsync(() -> users.stream()
                         .map(this::getIpAddressesFromUser)
                         .flatMap(List::stream)
                         .collect(Collectors.toList())
                 ).thenApply(this::getCountryStatistic);
 
-        return users.stream()
-                .map(this::createUserReports)
-                .flatMap(List::stream)
+        CompletableFuture<List<DayOfWeekStatistic>> dayOfWeekCf = CompletableFuture
+                .supplyAsync(() -> users.stream()
+                        .map(user -> user.getTimestampHeadersMap().keySet())
+                        .map(ArrayList::new)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList())
+                ).thenApply(this::getDaysOfWeekFromTimestamps);
+
+        CompletableFuture<List<TimeOfDayStatistic>> timeOfDayCf = CompletableFuture
+                .supplyAsync(() -> users.stream()
+                        .map(user -> user.getTimestampHeadersMap().keySet())
+                        .map(ArrayList::new)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList()))
+                .thenApply(this::getTimeOfDayFromTimestamps);
+
+        CompletableFuture<List<PageStatistic>> pageCf = CompletableFuture
+                .supplyAsync(() -> users.stream()
+                        .map(user -> user.getTimestampHeadersMap().values().stream()
+                                .map(headers -> headers.getFirst("referer"))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList()))
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList()))
+                .thenApply(this::collectPagesFromList);
+
+        try {
+            browserCf.get();
+            countryCf.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<PageStatistic> collectPagesFromList(List<String> strList) {
+        Map<String, Long> map = new HashMap<>();
+        for (String str : strList) {
+            map.merge(str, 1L, Long::sum);
+        }
+        return map.entrySet().stream()
+                .map(entry -> new PageStatistic(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private List<TimeOfDayStatistic> getTimeOfDayFromTimestamps(List<Long> tsList) {
+        Map<Integer, Long> map = new HashMap<>();
+        Calendar calendar = GregorianCalendar.getInstance();
+        for (Long ts : tsList) {
+            calendar.setTimeInMillis(ts);
+            map.merge(calendar.get(Calendar.HOUR_OF_DAY), 1L, Long::sum);
+        }
+        return map.entrySet().stream()
+                .map(entry -> new TimeOfDayStatistic(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private List<DayOfWeekStatistic> getDaysOfWeekFromTimestamps(List<Long> tsList) {
+        Map<DayOfWeek, Long> map = new HashMap<>();
+        Calendar calendar = GregorianCalendar.getInstance();
+        for (Long ts : tsList) {
+            calendar.setTimeInMillis(ts);
+            map.merge(DayOfWeek.of(calendar.get(Calendar.DAY_OF_WEEK)), 1L, Long::sum);
+        }
+        return map.entrySet().stream()
+                .map(entry -> new DayOfWeekStatistic(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -56,47 +114,52 @@ public class ReporterServiceImpl implements ReporterService {
                 .map(headers -> headers.getFirst("user-agent"))
                 .map(UserAgent::parseUserAgentString).collect(Collectors.toList());
     }
-    private List<String> getIpAddressesFromUser(User user){
+
+    private List<String> getIpAddressesFromUser(User user) {
         return user.getTimestampHeadersMap().values().stream()
                 .map(headers -> headers.getFirst(IP_ADDRESS_HEADER_NAME))
                 .collect(Collectors.toList());
     }
 
-    private BrowserStatistic getBrowserStatistic(List<UserAgent> userAgentList) {
-        Map<String, Integer> map = new HashMap<>();
+    private List<BrowserStatistic> getBrowserStatistic(List<UserAgent> userAgentList) {
+        Map<String, Long> map = new HashMap<>();
         for (UserAgent userAgent : userAgentList) {
-            map.merge(userAgent.getBrowser().getName(), 1, Integer::sum);
+            map.merge(userAgent.getBrowser().getName(), 1L, Long::sum);
         }
-        return new BrowserStatistic(map);
+        return map.entrySet().stream()
+                .map(entry -> new BrowserStatistic(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
-    private CountryStatistic getCountryStatistic(List<String> ipAddressList) {
-        Map<String, Integer> map = new HashMap<>();
+    private List<CountryStatistic> getCountryStatistic(List<String> ipAddressList) {
+        Map<String, Long> map = new HashMap<>();
         for (String ipAddress : ipAddressList) {
-            map.merge(geolocationService.getCountryFromIP(ipAddress), 1, Integer::sum);
+            map.merge(geolocationService.getCountryFromIP(ipAddress), 1L, Long::sum);
         }
-        return new CountryStatistic(map);
+        return map.entrySet().stream()
+                .map(entry -> new CountryStatistic(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
 
     ////////////////////////deprecated too////////////////////
-    private List<SessionReport> createUserReports(User user) {
-        List<SessionReport> reports = new ArrayList<>();
-        for (Map.Entry<Long, HttpHeaders> timestampHeadersEntry : user.getTimestampHeadersMap().entrySet()) {
-            HttpHeaders headers = timestampHeadersEntry.getValue();
-            String language = headers.getFirst(HttpHeaders.ACCEPT_LANGUAGE);
-            String region = geolocationService.getCountryFromIP(headers.getFirst(IP_ADDRESS_HEADER_NAME));
-            String os = null, platform = null;
-            if (headers.getFirst(HttpHeaders.USER_AGENT) != null) {
-                UserAgent userAgent = UserAgent.parseUserAgentString(headers.getFirst(HttpHeaders.USER_AGENT));
-                os = userAgent.getOperatingSystem().getName();
-                platform = userAgent.getOperatingSystem().getDeviceType().getName();
-            }
-            long ts = timestampHeadersEntry.getKey();
-            reports.add(SessionReport.builder().timestamp(ts).language(language).region(region).os(os).platform(platform).user(user).build());
-        }
-        return reports;
-    }
+//    private List<SessionReport> createUserReports(User user) {
+//        List<SessionReport> reports = new ArrayList<>();
+//        for (Map.Entry<Long, HttpHeaders> timestampHeadersEntry : user.getTimestampHeadersMap().entrySet()) {
+//            HttpHeaders headers = timestampHeadersEntry.getValue();
+//            String language = headers.getFirst(HttpHeaders.ACCEPT_LANGUAGE);
+//            String region = geolocationService.getCountryFromIP(headers.getFirst(IP_ADDRESS_HEADER_NAME));
+//            String os = null, platform = null;
+//            if (headers.getFirst(HttpHeaders.USER_AGENT) != null) {
+//                UserAgent userAgent = UserAgent.parseUserAgentString(headers.getFirst(HttpHeaders.USER_AGENT));
+//                os = userAgent.getOperatingSystem().getName();
+//                platform = userAgent.getOperatingSystem().getDeviceType().getName();
+//            }
+//            long ts = timestampHeadersEntry.getKey();
+//            reports.add(SessionReport.builder().timestamp(ts).language(language).region(region).os(os).platform(platform).user(user).build());
+//        }
+//        return reports;
+//    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////DEPRECATED//////////////////////////////////////////////////////////////////////

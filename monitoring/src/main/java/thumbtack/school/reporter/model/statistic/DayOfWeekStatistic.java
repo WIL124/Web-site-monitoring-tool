@@ -2,16 +2,18 @@ package thumbtack.school.reporter.model.statistic;
 
 import lombok.Data;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
 @Data
-public class CountryStatistic {
+public class DayOfWeekStatistic {
     private long id;
-    private String name;
+    private DayOfWeek dayOfWeek;
     private long count;
     private LocalDateTime createdAt;
-    public CountryStatistic(String name, long count) {
-        this.name = name;
+
+    public DayOfWeekStatistic(DayOfWeek dayOfWeek, long count) {
+        this.dayOfWeek = dayOfWeek;
         this.count = count;
     }
 }
