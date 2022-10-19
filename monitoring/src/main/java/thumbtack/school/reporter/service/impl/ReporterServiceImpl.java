@@ -2,7 +2,9 @@ package thumbtack.school.reporter.service.impl;
 
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import thumbtack.school.reporter.dao.*;
 import thumbtack.school.reporter.model.statistic.*;
 import thumbtack.school.reporter.service.GeolocationService;
 import thumbtack.school.reporter.service.ReporterService;
@@ -10,6 +12,7 @@ import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.model.User;
 
 import java.time.DayOfWeek;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -18,6 +21,16 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ReporterServiceImpl implements ReporterService {
+    @Autowired
+    private BrowserStatisticRepository browserStatisticRepository;
+    @Autowired
+    private PageStatisticRepository pageStatisticRepository;
+    @Autowired
+    private CountryStatisticRepository countryStatisticRepository;
+    @Autowired
+    private DayOfWeekStatisticRepository dayOfWeekStatisticRepository;
+    @Autowired
+    private TimeOfDayStatisticRepository timeOfDayStatisticRepository;
     private HbaseDao hbaseDao;
     private GeolocationService geolocationService;
     private static final String TABLE_NAME = "userTracker";
@@ -68,8 +81,11 @@ public class ReporterServiceImpl implements ReporterService {
                 .thenApply(this::collectPagesFromList);
 
         try {
-            browserCf.get();
-            countryCf.get();
+            browserStatisticRepository.saveAll(browserCf.get());
+            timeOfDayStatisticRepository.saveAll(timeOfDayCf.get());
+            countryStatisticRepository.saveAll(countryCf.get());
+            dayOfWeekStatisticRepository.saveAll(dayOfWeekCf.get());
+            pageStatisticRepository.saveAll(pageCf.get());
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -105,7 +121,7 @@ public class ReporterServiceImpl implements ReporterService {
             map.merge(DayOfWeek.of(calendar.get(Calendar.DAY_OF_WEEK)), 1L, Long::sum);
         }
         return map.entrySet().stream()
-                .map(entry -> new DayOfWeekStatistic(entry.getKey(), entry.getValue()))
+                .map(entry -> new DayOfWeekStatistic(entry.getKey().getDisplayName(TextStyle.FULL, Locale.ENGLISH), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
