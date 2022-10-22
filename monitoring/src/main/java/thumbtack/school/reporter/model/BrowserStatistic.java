@@ -1,4 +1,4 @@
-package thumbtack.school.reporter.model.statistic;
+package thumbtack.school.reporter.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

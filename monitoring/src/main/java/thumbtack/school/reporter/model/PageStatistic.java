@@ -1,4 +1,4 @@
-package thumbtack.school.reporter.model.statistic;
+package thumbtack.school.reporter.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,21 +14,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "countries")
-public class CountryStatistic {
+@Table(name = "pages")
+public class PageStatistic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "name", nullable = false)
-    private String name;
-    @Column(name = "count", nullable = false)
+    @Column(name = "url")
+    private String url;
+    @Column(name = "count")
     private long count;
-    @Column(name = "created_at")
     @CreationTimestamp
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public CountryStatistic(String name, long count) {
-        this.name = name;
+    public PageStatistic(String url, long count) {
+        this.url = url;
         this.count = count;
     }
 }
