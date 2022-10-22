@@ -17,7 +17,7 @@ create table if not exists countries
     count      bigint    not null,
     created_at timestamp not null
 );
-create table if not exists dayOfWeeks
+create table if not exists days_of_week
 (
     id         bigserial not null primary key,
     name       text      not null,
@@ -31,10 +31,10 @@ create table if not exists pages
     count      bigint    not null,
     created_at timestamp not null
 );
-create table if not exists timeOfDay
+create table if not exists time_of_day
 (
     id         bigserial not null primary key,
-    int        smallint  not null,
+    hour        smallint  not null,
     count      bigint    not null,
     created_at timestamp not null
 );
