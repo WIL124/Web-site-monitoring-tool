@@ -12,10 +12,8 @@ import java.util.concurrent.ExecutionException;
 
 @Component
 @AllArgsConstructor
-@NoArgsConstructor
 @Slf4j
 public class TableCreator implements CommandLineRunner {
-    @Autowired
     private TrackerService service;
     private static final String TABLE_NAME = "userTracker";
 

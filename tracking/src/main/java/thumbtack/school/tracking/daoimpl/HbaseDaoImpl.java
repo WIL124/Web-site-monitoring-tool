@@ -1,31 +1,26 @@
 package thumbtack.school.tracking.daoimpl;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import thumbtack.school.tracking.dao.HbaseDao;
 import thumbtack.school.tracking.mapper.UserMapper;
 import thumbtack.school.tracking.model.User;
-import thumbtack.school.tracking.repo.HbaseRepository;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 
-@Component
-@NoArgsConstructor
+@Repository
 @AllArgsConstructor
 public class HbaseDaoImpl implements HbaseDao {
-    @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private HbaseRepository repository;
+    private CompletableFuture<AsyncConnection> asyncConnection;
     private static final String COLUMN_FAMILY_NAME = "data";
 
     @Override
@@ -36,45 +31,44 @@ public class HbaseDaoImpl implements HbaseDao {
                         .setMaxVersions(10000).setTimeToLive(2 * 30 * 24 * 60 * 60 * 100);
         TableDescriptor tableDescriptor = new TableDescriptorBuilder.ModifyableTableDescriptor(table)
                 .setColumnFamily(cfDescriptor);
-        repository.createTable(tableDescriptor, table);
+        AsyncAdmin asyncAdmin = asyncConnection.get().getAdmin();
+        if (!asyncAdmin.tableExists(TableName.valueOf(tableName)).get()) {
+            asyncAdmin.createTable(tableDescriptor);
+        }
     }
 
     @Override
     public void put(String tableName, User user) {
-        CompletableFuture<Put> putCompletableFuture = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture.supplyAsync(() -> {
             Put put = new Put(toBytes(user.getId()));
             user.getTimestampHeadersMap().values().forEach(
                     header -> header.forEach((name, values) ->
                             values.forEach(value -> put.addColumn(toBytes(COLUMN_FAMILY_NAME), toBytes(name), toBytes(value)))));
             return put;
-        });
-        repository.put(TableName.valueOf(tableName), putCompletableFuture);
-    }
-
-
-    @Override
-    public List<User> getAllUsers(String tableName) {
-        List<User> users = new ArrayList<>();
-        CompletableFuture<List<Result>> cfResults = repository.getAll(TableName.valueOf(tableName));
-        try {
-            cfResults.get().parallelStream().forEach(result ->
-                    users.add(userMapper.fromResult(result)));
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-        return users;
+        }).thenCombine(asyncConnection, (putWithData, connection) ->
+                connection.getTable(TableName.valueOf(tableName)).put(putWithData));
     }
 
     @Override
     public List<User> getAllUsersWithTimeRange(String tableName, long minRange, long maxRange) {
-        List<User> users = new ArrayList<>();
-        CompletableFuture<List<Result>> cfResults = repository.getAllWithTimeRange(TableName.valueOf(tableName), minRange, maxRange);
         try {
-            cfResults.get().parallelStream().forEach(result ->
-                    users.add(userMapper.fromResult(result)));
+            return asyncConnection.thenApply(connection -> connection.getTable(TableName.valueOf(tableName)))
+                    .thenCompose(table -> table.scanAll(fullScanWithTimeRange(minRange, maxRange)))
+                    .thenApply(resultList -> resultList.stream().map(result -> userMapper.fromResult(result)).collect(Collectors.toList())).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-        return users;
+    }
+
+    private Scan fullScan() {
+        return new Scan().readAllVersions();
+    }
+
+    private Scan fullScanWithTimeRange(long min, long max) {
+        try {
+            return fullScan().setTimeRange(min, max);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

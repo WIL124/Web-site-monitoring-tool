@@ -1,8 +1,6 @@
 package thumbtack.school.tracking.service;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -11,15 +9,13 @@ import thumbtack.school.tracking.model.User;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException; 
+import java.util.concurrent.ExecutionException;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class TrackerService {
     private static final String TABLE_NAME = "userTracker";
     private static final String IP_ADDRESS_HEADER_NAME = "IP address";
-    @Autowired
     private HbaseDao hbaseDao;
 
     @Async

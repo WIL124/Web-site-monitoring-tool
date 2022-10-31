@@ -7,11 +7,7 @@ import thumbtack.school.reporter.service.ReporterService;
 
 @SpringBootTest
 class ReporterApplicationTests {
-    @Autowired
-    ReporterService reporterService;
     @Test
     void contextLoads() {
-        reporterService.getReport(0, Long.MAX_VALUE);
     }
-
 }
