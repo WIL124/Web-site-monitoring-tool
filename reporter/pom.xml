@@ -8,14 +8,17 @@
         <artifactId>step3</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>monitoring</artifactId>
+    <artifactId>reporter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>thumbtack.school</groupId>
             <artifactId>tracking</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <type>jar</type>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/../tracking/target/tracking-0.0.1-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>eu.bitwalker</groupId>
@@ -42,4 +45,13 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

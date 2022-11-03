@@ -7,6 +7,7 @@ import thumbtack.school.reporter.service.ReporterService;
 
 @SpringBootTest
 class ReporterApplicationTests {
+
     @Test
     void contextLoads() {
     }
