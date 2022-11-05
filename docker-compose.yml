@@ -10,19 +10,26 @@ services:
       - POSTGRES_DB=monitoring
     volumes:
       - ../sql:/docker-entrypoint-initdb.d
-    networks:
-      - postgres-reporter
+      - ../tracking/target/tracking-0.0.1-SNAPSHOT.jar:/lib/tracking-0.0.1-SNAPSHOT.jar
+    ports:
+      - "5432:5432"
+#    networks:
+#      - postgres-reporter
   hbase:
     image: dajobe/hbase
     container_name: hbase
     hostname: hbase
+    environment:
+    - HBASE_DOCKER_HOSTNAME=hbase
     networks:
       - hbase-tracker
-      - hbase-reporter
+#      - hbase-reporter
   pixel-tracker:
     image: openjdk:11-jdk
     container_name: pixel-tracker
     hostname: tracker
+#    links:
+#      - hbase
     volumes:
       - D:\Projects\step3\tracking\target\tracking-0.0.1-SNAPSHOT.jar:/opt/tracker.jar
     command: java -jar -Dspring.profiles.active=docker /opt/tracker.jar
@@ -34,23 +41,23 @@ services:
       - hbase
     environment:
       - HBASE_QUORUM=hbase:2181
-      - HBASE_ROOT_DIR=file:/data/hbase
+      - HBASE_ROOT_DIR=file:////data/hbase
       - HBASE_NODEPARENT=/hbase
   reporter:
     image: openjdk:11-jdk
     container_name: reporter
     networks:
-      - hbase-reporter
-      - postgres-reporter
+      - hbase-tracker
+#      - postgres-reporter
     volumes:
       - D:\Projects\step3\reporter\target\reporter-0.0.1-SNAPSHOT.jar:/opt/reporter.jar
-    command: java -jar -Dspring.profiles.active=docker /opt/reporter.jar
+      - D:\Projects\step3\tracking\target\tracking-0.0.1-SNAPSHOT.jar:/opt/tracker.jar
+    command: java -Dspring.profiles.active=docker -cp "/opt/tracker.jar" -jar /opt/reporter.jar
     depends_on:
       - hbase
 networks:
   hbase-tracker:
     driver: bridge
-  postgres-reporter:
-    driver: bridge
-  hbase-reporter:
-    driver: bridge
+#  postgres-reporter:
+#    driver: bridge
+#  hbase-reporter:
