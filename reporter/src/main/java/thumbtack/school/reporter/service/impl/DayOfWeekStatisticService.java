@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.dao.DayOfWeekStatisticRepository;
 import thumbtack.school.reporter.model.DayOfWeekStatistic;
 import thumbtack.school.reporter.service.StatisticService;
-import thumbtack.school.tracking.model.User;
+import thumbtack.school.common.model.User;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;

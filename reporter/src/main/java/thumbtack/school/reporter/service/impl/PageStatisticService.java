@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.dao.PageStatisticRepository;
 import thumbtack.school.reporter.model.PageStatistic;
 import thumbtack.school.reporter.service.StatisticService;
-import thumbtack.school.tracking.model.User;
+import thumbtack.school.common.model.User;
 
 import java.util.HashMap;
 import java.util.List;

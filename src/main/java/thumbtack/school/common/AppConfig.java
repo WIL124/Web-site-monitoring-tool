@@ -1,6 +1,7 @@
-package thumbtack.school.tracking;
+package thumbtack.school.common;
 
 import lombok.NoArgsConstructor;
+import org.apache.catalina.authenticator.Constants;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.AsyncConnection;
@@ -26,11 +27,10 @@ public class AppConfig {
     @Bean
     org.apache.hadoop.conf.Configuration configuration(){
         org.apache.hadoop.conf.Configuration config = HBaseConfiguration.create();
-        String path = this.getClass()
-                .getClassLoader()
-                .getResource("hbase-site.xml")
-                .getPath();
-        config.addResource(new Path(path));
+        config.set("hbase.rpc.timeout", "1800000");
+        config.set("hbase.client.scanner.timeout.period", "1800000");
+        config.set("hbase.zookeeper.quorum", "hbase");
+        config.set("hbase.zookeeper.property.clientPort", "2181");
         return config;
     }
     @Bean

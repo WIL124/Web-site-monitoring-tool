@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.dao.TimeOfDayStatisticRepository;
 import thumbtack.school.reporter.model.TimeOfDayStatistic;
 import thumbtack.school.reporter.service.StatisticService;
-import thumbtack.school.tracking.model.User;
+import thumbtack.school.common.model.User;
 
 import java.util.*;
 import java.util.stream.Collectors;

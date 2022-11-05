@@ -1,4 +1,4 @@
-package thumbtack.school.tracking.model;
+package thumbtack.school.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
