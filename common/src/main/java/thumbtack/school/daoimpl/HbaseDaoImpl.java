@@ -1,12 +1,12 @@
-package thumbtack.school.common.daoimpl;
+package thumbtack.school.daoimpl;
 
 import lombok.AllArgsConstructor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.springframework.stereotype.Repository;
-import thumbtack.school.common.dao.HbaseDao;
-import thumbtack.school.common.mapper.UserMapper;
-import thumbtack.school.common.model.User;
+import thumbtack.school.dao.HbaseDao;
+import thumbtack.school.mapper.UserMapper;
+import thumbtack.school.model.User;
 
 import java.io.IOException;
 import java.util.List;

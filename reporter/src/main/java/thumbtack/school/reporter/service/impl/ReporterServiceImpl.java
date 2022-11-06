@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.model.*;
 import thumbtack.school.reporter.service.ReporterService;
 import thumbtack.school.reporter.service.StatisticService;
-import thumbtack.school.common.dao.HbaseDao;
-import thumbtack.school.common.model.User;
+import thumbtack.school.dao.HbaseDao;
+import thumbtack.school.model.User;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

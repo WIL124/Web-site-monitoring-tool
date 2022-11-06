@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import thumbtack.school.reporter.dao.CountryStatisticRepository;
 import thumbtack.school.reporter.model.CountryStatistic;
 import thumbtack.school.reporter.service.StatisticService;
-import thumbtack.school.common.model.User;
+import thumbtack.school.model.User;
 
 import java.io.IOException;
 import java.util.HashMap;

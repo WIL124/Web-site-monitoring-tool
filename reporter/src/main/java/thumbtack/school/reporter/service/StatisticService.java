@@ -1,6 +1,6 @@
 package thumbtack.school.reporter.service;
 
-import thumbtack.school.common.model.User;
+import thumbtack.school.model.User;
 
 import java.util.List;
 

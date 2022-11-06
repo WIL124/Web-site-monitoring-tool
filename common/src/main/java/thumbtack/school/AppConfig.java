@@ -1,8 +1,6 @@
-package thumbtack.school.common;
+package thumbtack.school;
 
 import lombok.NoArgsConstructor;
-import org.apache.catalina.authenticator.Constants;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.AsyncConnection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;

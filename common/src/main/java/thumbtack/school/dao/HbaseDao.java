@@ -1,6 +1,6 @@
-package thumbtack.school.common.dao;
+package thumbtack.school.dao;
 
-import thumbtack.school.common.model.User;
+import thumbtack.school.model.User;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

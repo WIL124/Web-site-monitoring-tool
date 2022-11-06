@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import thumbtack.school.common.dao.HbaseDao;
-import thumbtack.school.common.model.User;
+import thumbtack.school.dao.HbaseDao;
+import thumbtack.school.model.User;
 
 import java.util.Collections;
 import java.util.HashMap;
