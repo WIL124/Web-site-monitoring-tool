@@ -1,3 +1,5 @@
+CREATE Schema if not exists monitoring;
+
 drop table if exists browsers;
 drop table if exists countries;
 drop table if exists daysOfWeek;

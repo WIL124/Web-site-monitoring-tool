@@ -9,8 +9,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=monitoring
     volumes:
-      - ../sql:/docker-entrypoint-initdb.d
-      - ../tracking/target/tracking-0.0.1-SNAPSHOT.jar:/lib/tracking-0.0.1-SNAPSHOT.jar
+      - ./sql:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
   hbase:
@@ -39,6 +38,6 @@ services:
     container_name: reporter
     volumes:
       - ./reporter/target/reporter-0.0.1-SNAPSHOT.jar:/opt/reporter.jar
-    command: java -Dspring.profiles.active=docker -cp "/opt/tracker.jar" -jar /opt/reporter.jar
+    command: java -Dspring.profiles.active=docker -jar /opt/reporter.jar
     depends_on:
       - hbase
