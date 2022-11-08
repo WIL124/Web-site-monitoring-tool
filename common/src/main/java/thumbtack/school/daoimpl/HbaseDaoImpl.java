@@ -1,6 +1,7 @@
 package thumbtack.school.daoimpl;
 
 import lombok.AllArgsConstructor;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.springframework.stereotype.Repository;
@@ -19,8 +20,8 @@ import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 @Repository
 @AllArgsConstructor
 public class HbaseDaoImpl implements HbaseDao {
-    private UserMapper userMapper;
-    private CompletableFuture<AsyncConnection> asyncConnection;
+    private final UserMapper userMapper;
+    private final Configuration configuration;
     private static final String COLUMN_FAMILY_NAME = "data";
 
     @Override
@@ -31,7 +32,7 @@ public class HbaseDaoImpl implements HbaseDao {
                         .setMaxVersions(10000).setTimeToLive(2 * 30 * 24 * 60 * 60 * 100);
         TableDescriptor tableDescriptor = new TableDescriptorBuilder.ModifyableTableDescriptor(table)
                 .setColumnFamily(cfDescriptor);
-        AsyncAdmin asyncAdmin = asyncConnection.get().getAdmin();
+        AsyncAdmin asyncAdmin = createConnection().get().getAdmin();
         if (!asyncAdmin.tableExists(TableName.valueOf(tableName)).get()) {
             asyncAdmin.createTable(tableDescriptor);
         }
@@ -45,19 +46,23 @@ public class HbaseDaoImpl implements HbaseDao {
                     header -> header.forEach((name, values) ->
                             values.forEach(value -> put.addColumn(toBytes(COLUMN_FAMILY_NAME), toBytes(name), toBytes(value)))));
             return put;
-        }).thenCombine(asyncConnection, (putWithData, connection) ->
+        }).thenCombine(createConnection(), (putWithData, connection) ->
                 connection.getTable(TableName.valueOf(tableName)).put(putWithData));
     }
 
     @Override
     public List<User> getAllUsersWithTimeRange(String tableName, long minRange, long maxRange) {
         try {
-            return asyncConnection.thenApply(connection -> connection.getTable(TableName.valueOf(tableName)))
+            return createConnection().thenApply(connection -> connection.getTable(TableName.valueOf(tableName)))
                     .thenCompose(table -> table.scanAll(fullScanWithTimeRange(minRange, maxRange)))
-                    .thenApply(resultList -> resultList.stream().map(result -> userMapper.fromResult(result)).collect(Collectors.toList())).get();
+                    .thenApply(resultList -> resultList.stream().map(userMapper::fromResult).collect(Collectors.toList())).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private CompletableFuture<AsyncConnection> createConnection() {
+        return ConnectionFactory.createAsyncConnection(configuration);
     }
 
     private Scan fullScan() {

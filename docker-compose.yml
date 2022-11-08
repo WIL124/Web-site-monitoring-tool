@@ -41,3 +41,4 @@ services:
     command: java -Dspring.profiles.active=docker -jar /opt/reporter.jar
     depends_on:
       - hbase
+      - postgres
