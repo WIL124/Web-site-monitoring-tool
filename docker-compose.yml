@@ -21,7 +21,7 @@ services:
   pixel-tracker:
     image: openjdk:11-jdk
     container_name: pixel-tracker
-    hostname: tracker
+    hostname: pixel-tracker
     volumes:
       - ./tracking/target/tracking-0.0.1-SNAPSHOT.jar:/opt/tracker.jar
     command: java -jar -Dspring.profiles.active=docker /opt/tracker.jar
@@ -42,3 +42,11 @@ services:
     depends_on:
       - hbase
       - postgres
+  demo-site:
+    image: httpd:2.4
+    container_name: demo-site
+    hostname: demo-site
+    volumes:
+      - ./demo-site:/usr/local/apache2/htdocs/
+    ports:
+      - "8080:80"

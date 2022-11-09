@@ -27,7 +27,7 @@ public class ReporterServiceImpl implements ReporterService {
     private static final String TABLE_NAME = "userTracker";
 
     @Override
-    @Scheduled(cron = "@hourly")
+    @Scheduled(cron = "${cron.string}")
     public void getReport() {
         LocalDateTime dateTime = LocalDateTime.now();
         long timestampFrom = Timestamp.valueOf(dateTime.minusHours(1)).getTime();
