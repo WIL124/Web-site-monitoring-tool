@@ -2,10 +2,10 @@ package thumbtack.school.reporter.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import thumbtack.school.model.User;
 import thumbtack.school.reporter.dao.DayOfWeekStatisticRepository;
 import thumbtack.school.reporter.model.DayOfWeekStatistic;
 import thumbtack.school.reporter.service.StatisticService;
-import thumbtack.school.model.User;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class DayOfWeekStatisticService implements StatisticService<DayOfWeekStatistic> {
     private DayOfWeekStatisticRepository repository;
+
     @Override
     public List<DayOfWeekStatistic> getStatistic(List<User> users) {
         List<Long> timestamps = users.stream()
@@ -30,12 +31,13 @@ public class DayOfWeekStatisticService implements StatisticService<DayOfWeekStat
     public void saveAll(List<DayOfWeekStatistic> statistic) {
         repository.saveAll(statistic);
     }
+
     private List<DayOfWeekStatistic> getDaysOfWeekFromTimestamps(List<Long> tsList) {
         Map<DayOfWeek, Long> map = new HashMap<>();
         Calendar calendar = GregorianCalendar.getInstance();
         for (Long ts : tsList) {
             calendar.setTimeInMillis(ts);
-            map.merge(DayOfWeek.of(calendar.get(Calendar.DAY_OF_WEEK)), 1L, Long::sum);
+            map.merge(DayOfWeek.of(calendar.get(Calendar.DAY_OF_WEEK) - 1), 1L, Long::sum);
         }
         return map.entrySet().stream()
                 .map(entry ->
