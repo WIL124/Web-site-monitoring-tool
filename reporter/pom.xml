@@ -47,6 +47,12 @@
             <artifactId>step3</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>thumbtack.school</groupId>
+            <artifactId>common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -71,5 +77,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -17,6 +17,7 @@
         <module>tracking</module>
         <module>reporter</module>
         <module>api</module>
+        <module>common</module>
     </modules>
     <properties>
         <java.version>11</java.version>

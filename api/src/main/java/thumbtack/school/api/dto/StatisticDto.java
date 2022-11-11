@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class DayOfWeekDto {
+public class StatisticDto {
     private String name;
     private long count;
 }
