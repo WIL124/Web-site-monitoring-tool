@@ -1,10 +1,10 @@
-package thumbtack.school.mapper;
+package thumbtack.school.common.mapper;
 
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Result;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import thumbtack.school.model.User;
+import thumbtack.school.common.model.User;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package thumbtack.school;
+package thumbtack.school.common;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.springframework.context.annotation.Bean;

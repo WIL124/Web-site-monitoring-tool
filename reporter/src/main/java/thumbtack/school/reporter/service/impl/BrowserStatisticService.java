@@ -4,7 +4,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import thumbtack.school.model.User;
+import thumbtack.school.common.model.User;
 import thumbtack.school.reporter.dao.BrowserStatisticRepository;
 import thumbtack.school.reporter.model.BrowserStatistic;
 import thumbtack.school.reporter.service.StatisticService;

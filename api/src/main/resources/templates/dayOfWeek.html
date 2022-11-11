@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Day of Week Statistic</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th>NAME</th>
+        <th>COUNT</th>
+    </tr>
+    <tr th:each="statistic : ${stat}">
+        <td th:text="${statistic.dayOfWeek}"></td>
+        <td th:text="${statistic.count}"></td>
+    </tr>
+</table>
+</body>
+</html>

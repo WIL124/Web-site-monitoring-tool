@@ -2,7 +2,7 @@ package thumbtack.school.reporter.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import thumbtack.school.model.User;
+import thumbtack.school.common.model.User;
 import thumbtack.school.reporter.dao.DayOfWeekStatisticRepository;
 import thumbtack.school.reporter.model.DayOfWeekStatistic;
 import thumbtack.school.reporter.service.StatisticService;
