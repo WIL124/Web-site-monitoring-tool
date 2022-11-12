@@ -12,9 +12,40 @@
         <th>COUNT</th>
     </tr>
     <tr th:each="statistic : ${stat}">
-        <td th:text="${statistic.dayOfWeek}"></td>
+        <td th:text="${statistic.name}"></td>
         <td th:text="${statistic.count}"></td>
     </tr>
 </table>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" th:each="statistic : ${stat}">
+    google.charts.load('current', {'packages':['bar']});
+    google.charts.setOnLoadCallback(drawStuff);
+
+    function drawStuff() {
+        var data = new google.visualization.arrayToDataTable([
+            ['Day of week', 'Visits count'],
+            [[${statistic.name}]]
+        ]);
+
+        var options = {
+            width: 800,
+            legend: { position: 'none' },
+            chart: {
+                title: 'Chess opening moves',
+                subtitle: 'popularity by percentage' },
+            axes: {
+                x: {
+                    0: { side: 'top', label: 'White to move'} // Top x-axis.
+                }
+            },
+            bar: { groupWidth: "90%" }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('top_x_div'));
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+    };
+</script>
+
+<div id="top_x_div" style="width: 800px; height: 600px;"></div>
 </body>
 </html>

@@ -6,13 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-import thumbtack.school.api.service.DayOfWeekService;
+import thumbtack.school.common.service.DayOfWeekStatisticService;
 
 @RestController
 @RequestMapping("/days")
 @AllArgsConstructor
 public class DayOfWeekStatisticEndpoint {
-    private DayOfWeekService service;
+    private DayOfWeekStatisticService service;
 
     @GetMapping
     public ModelAndView getAll(Model model) {

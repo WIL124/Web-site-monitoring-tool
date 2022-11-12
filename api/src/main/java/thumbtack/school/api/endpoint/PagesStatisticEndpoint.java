@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import thumbtack.school.api.dto.StatisticDto;
-import thumbtack.school.api.service.PagesStatisticService;
+import thumbtack.school.common.dto.StatisticDto;
+import thumbtack.school.common.service.PageStatisticService;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/pages")
 @AllArgsConstructor
 public class PagesStatisticEndpoint {
-    private PagesStatisticService service;
+    private PageStatisticService service;
 
     @GetMapping
     public List<StatisticDto> getAll() {

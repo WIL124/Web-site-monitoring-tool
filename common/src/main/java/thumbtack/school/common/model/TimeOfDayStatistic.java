@@ -1,4 +1,4 @@
-package thumbtack.school.reporter.model;
+package thumbtack.school.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,29 +7,27 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "days_of_week")
-public class DayOfWeekStatistic {
+@Table(name = "time_of_day")
+public class TimeOfDayStatistic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "name")
-    private String dayOfWeek;
+    @Column(name = "hour")
+    private int hour;
     @Column(name = "count")
     private long count;
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public DayOfWeekStatistic(String dayOfWeek, long count) {
-        this.dayOfWeek = dayOfWeek;
+    public TimeOfDayStatistic(int hour, long count) {
+        this.hour = hour;
         this.count = count;
     }
 }

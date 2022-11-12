@@ -1,15 +1,14 @@
-package thumbtack.school.reporter.dao;
+package thumbtack.school.common.dao;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import thumbtack.school.reporter.model.CountryStatistic;
+import thumbtack.school.common.model.CountryStatistic;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URL;
 
 @Repository
 public interface CountryStatisticRepository extends JpaRepository<CountryStatistic, Long> {

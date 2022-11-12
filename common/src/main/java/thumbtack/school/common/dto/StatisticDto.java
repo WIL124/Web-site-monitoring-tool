@@ -1,4 +1,4 @@
-package thumbtack.school.api.dto;
+package thumbtack.school.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

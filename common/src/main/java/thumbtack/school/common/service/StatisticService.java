@@ -1,4 +1,4 @@
-package thumbtack.school.reporter.service;
+package thumbtack.school.common.service;
 
 import thumbtack.school.common.model.User;
 

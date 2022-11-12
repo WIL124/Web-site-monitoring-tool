@@ -3,11 +3,10 @@ package thumbtack.school.reporter.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import thumbtack.school.reporter.model.*;
+import thumbtack.school.common.model.*;
 import thumbtack.school.reporter.service.ReporterService;
-import thumbtack.school.reporter.service.StatisticService;
+import thumbtack.school.common.service.StatisticService;
 import thumbtack.school.common.dao.HbaseDao;
-import thumbtack.school.common.model.User;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

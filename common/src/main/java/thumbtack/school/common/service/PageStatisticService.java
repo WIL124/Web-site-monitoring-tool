@@ -1,10 +1,10 @@
-package thumbtack.school.reporter.service.impl;
+package thumbtack.school.common.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import thumbtack.school.reporter.dao.PageStatisticRepository;
-import thumbtack.school.reporter.model.PageStatistic;
-import thumbtack.school.reporter.service.StatisticService;
+import thumbtack.school.common.dao.PageStatisticRepository;
+import thumbtack.school.common.dto.StatisticDto;
+import thumbtack.school.common.model.PageStatistic;
 import thumbtack.school.common.model.User;
 
 import java.util.HashMap;
@@ -18,6 +18,14 @@ import java.util.stream.Collectors;
 public class PageStatisticService implements StatisticService<PageStatistic> {
     private PageStatisticRepository repository;
 
+    public List<StatisticDto> getAll(){
+        return repository.findAll().stream()
+                .collect(Collectors.groupingBy(PageStatistic::getUrl, Collectors.summingLong(PageStatistic::getCount)))
+                .entrySet()
+                .stream()
+                .map(entry -> new StatisticDto(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
     @Override
     public List<PageStatistic> getStatistic(List<User> users) {
         List<String> pages = users.stream()
