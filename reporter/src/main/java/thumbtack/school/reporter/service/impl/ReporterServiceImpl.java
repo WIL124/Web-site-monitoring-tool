@@ -3,10 +3,10 @@ package thumbtack.school.reporter.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import thumbtack.school.common.model.*;
-import thumbtack.school.reporter.service.ReporterService;
-import thumbtack.school.common.service.StatisticService;
-import thumbtack.school.common.dao.HbaseDao;
+import thumbtack.school.hbase.dao.HbaseDao;
+import thumbtack.school.hbase.model.User;
+import thumbtack.school.postgres.model.*;
+import thumbtack.school.reporter.service.StatisticService;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
-public class ReporterServiceImpl implements ReporterService {
+public class ReporterServiceImpl {
 
     private StatisticService<BrowserStatistic> browserStatisticService;
     private StatisticService<DayOfWeekStatistic> dayOfWeekStatisticStatisticService;
@@ -25,7 +25,6 @@ public class ReporterServiceImpl implements ReporterService {
     private HbaseDao hbaseDao;
     private static final String TABLE_NAME = "userTracker";
 
-    @Override
     @Scheduled(cron = "${cron.string}")
     public void getReport() {
         LocalDateTime dateTime = LocalDateTime.now();

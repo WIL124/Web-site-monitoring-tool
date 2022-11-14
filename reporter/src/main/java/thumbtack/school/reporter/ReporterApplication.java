@@ -1,12 +1,15 @@
 package thumbtack.school.reporter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = "thumbtack.school")
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = "thumbtack.school")
+@EntityScan(basePackages = "thumbtack.school.postgres.model")
 @EnableScheduling
 public class ReporterApplication {
     public static void main(String[] args) {

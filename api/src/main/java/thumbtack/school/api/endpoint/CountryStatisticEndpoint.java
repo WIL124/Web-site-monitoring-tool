@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import thumbtack.school.common.dto.StatisticDto;
-import thumbtack.school.common.service.CountryStatisticService;
+import thumbtack.school.api.dto.StatisticDto;
+import thumbtack.school.api.service.CountryStatisticService;
 
 import java.util.List;
 

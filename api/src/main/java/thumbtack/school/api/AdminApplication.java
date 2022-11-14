@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(scanBasePackages = "thumbtack.school")
-@EnableJpaRepositories(basePackages = "thumbtack.school.reporter.dao" )
-@EntityScan(basePackages = "thumbtack.school.reporter.model")
+@EnableJpaRepositories(basePackages = {"thumbtack.school"})
+@EntityScan(basePackages = "thumbtack.school.postgres.model")
 @AutoConfigurationPackage
 public class AdminApplication {
     public static void main(String[] args) {
