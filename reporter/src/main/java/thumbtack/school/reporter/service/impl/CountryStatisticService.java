@@ -1,13 +1,13 @@
-package thumbtack.school.common.service;
+package thumbtack.school.reporter.service.impl;
 
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import thumbtack.school.common.dao.CountryStatisticRepository;
-import thumbtack.school.common.dto.StatisticDto;
-import thumbtack.school.common.model.CountryStatistic;
-import thumbtack.school.common.model.User;
+import thumbtack.school.postgres.model.CountryStatistic;
+import thumbtack.school.hbase.model.User;
+import thumbtack.school.postgres.dao.CountryStatisticRepository;
+import thumbtack.school.reporter.service.StatisticService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,14 +22,6 @@ public class CountryStatisticService implements StatisticService<CountryStatisti
     private CountryStatisticRepository repository;
     private static final String IP_ADDRESS_HEADER_NAME = "IP address";
 
-    public List<StatisticDto> getAll() {
-        return repository.findAll().stream()
-                .collect(Collectors.groupingBy(CountryStatistic::getName, Collectors.summingLong(CountryStatistic::getCount)))
-                .entrySet()
-                .stream()
-                .map(entry -> new StatisticDto(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-    }
     @Override
     public List<CountryStatistic> getStatistic(List<User> users) {
         List<String> ipAddresses = users.stream()

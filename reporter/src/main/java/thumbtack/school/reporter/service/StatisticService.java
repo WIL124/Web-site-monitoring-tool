@@ -1,6 +1,6 @@
-package thumbtack.school.common.service;
+package thumbtack.school.reporter.service;
 
-import thumbtack.school.common.model.User;
+import thumbtack.school.hbase.model.User;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
-package thumbtack.school.common.service;
+package thumbtack.school.reporter.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import thumbtack.school.common.dto.StatisticDto;
-import thumbtack.school.common.model.User;
-import thumbtack.school.common.dao.DayOfWeekStatisticRepository;
-import thumbtack.school.common.model.DayOfWeekStatistic;
+import thumbtack.school.hbase.model.User;
+import thumbtack.school.postgres.dao.DayOfWeekStatisticRepository;
+import thumbtack.school.postgres.model.DayOfWeekStatistic;
+import thumbtack.school.reporter.service.StatisticService;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
@@ -17,15 +17,6 @@ import java.util.stream.Collectors;
 public class DayOfWeekStatisticService implements StatisticService<DayOfWeekStatistic> {
     private DayOfWeekStatisticRepository repository;
 
-    public List<StatisticDto> getAll() {
-        return repository.findAll()
-                .stream()
-                .collect(Collectors.groupingBy(DayOfWeekStatistic::getDayOfWeek, Collectors.summingLong(DayOfWeekStatistic::getCount)))
-                .entrySet()
-                .stream()
-                .map(entry -> new StatisticDto(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-    }
     @Override
     public List<DayOfWeekStatistic> getStatistic(List<User> users) {
         List<Long> timestamps = users.stream()
