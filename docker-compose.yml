@@ -50,6 +50,14 @@ services:
       - ./demo-site:/usr/local/apache2/htdocs/
     ports:
       - "8080:80"
+  admin:
+    image: openjdk:11-jdk
+    container_name: admin
+    volumes:
+      - ./admin/target/admin-0.0.1-SNAPSHOT.jar:/opt/admin.jar
+    command: java -jar /opt/admin.jar
+    ports:
+      - "8084:8084"
   api:
     image: openjdk:11-jdk
     container_name: api

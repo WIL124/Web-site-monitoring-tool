@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org" lang="en">
+      xmlns:th="http://thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Day of Week Statistic</title>
@@ -24,7 +24,7 @@
     function drawStuff() {
         var data = new google.visualization.arrayToDataTable([
             ['Day of week', 'Visits count'],
-            [[${statistic.name}]]
+            [${statistic.name}]
         ]);
 
         var options = {

@@ -1,6 +1,7 @@
 package thumbtack.school.api.endpoint;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,7 @@ import thumbtack.school.api.dto.IntervalRequest;
 import thumbtack.school.api.dto.StatisticDto;
 import thumbtack.school.api.service.BrowserStatisticService;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -22,7 +24,6 @@ public class BrowsersStatisticEndpoint {
     public List<StatisticDto> getAll() {
         return service.getAllGrouped();
     }
-
     @GetMapping("/raw")
     public List<StatisticDto> getAllRaw() {
         return service.getAllRaw();

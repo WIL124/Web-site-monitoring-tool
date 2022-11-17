@@ -19,6 +19,7 @@
         <module>api</module>
         <module>common-hbase</module>
         <module>common-postgres</module>
+        <module>admin</module>
     </modules>
 
     <properties>
