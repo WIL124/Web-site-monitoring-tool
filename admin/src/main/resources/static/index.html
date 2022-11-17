@@ -14,7 +14,7 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript">
-        google.charts.load('current', {'packages': ['bar']});
+        google.charts.load('current', {'packages': ['bar', 'table']});
         google.charts.setOnLoadCallback(drawStatistic);
         var dataArray = [['Browser', 'Count']]
         $.ajaxSetup({
@@ -38,12 +38,15 @@
                 bar: {groupWidth: "90%"}
             };
             var chart = new google.charts.Bar(document.getElementById('chart'));
+            var table = new google.visualization.Table(document.getElementById('table_div'));
             chart.draw(data, google.charts.Bar.convertOptions(options));
+            table.draw(data, {showRowNumber: true, width: '800px', height: '75%'});
         }
     </script>
 </head>
 
 <body>
 <div id="chart" style="width: 1200px; height: 600px;"></div>
+<div id="table_div" style="width: 1200px; height: 600px;"></div>
 </body>
 </html>

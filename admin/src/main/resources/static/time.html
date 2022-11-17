@@ -14,7 +14,7 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript">
-        google.charts.load('current', {'packages': ['bar']});
+        google.charts.load('current', {'packages': ['corechart', 'table']});
         google.charts.setOnLoadCallback(drawStatistic);
         var dataArray = [['Hour', 'Count']]
         $.ajaxSetup({
@@ -22,28 +22,30 @@
         });
         $.getJSON('http://localhost:8082/time', function (data) {
             var jsonObj = data;
+            var array = []
             for (var i in jsonObj) {
-                dataArray.push([jsonObj[i].name, jsonObj[i].count]);
+                array.push([jsonObj[i].name, jsonObj[i].count]);
             }
+            array.sort((a, b) => a[0]-b[0]).map(a => dataArray.push(a))
         });
 
         function drawStatistic() {
             var data = new google.visualization.arrayToDataTable(dataArray);
             var options = {
-                width: 800,
-                legend: {position: 'none'},
-                chart: {
-                    title: 'Hours statistics',
-                },
-                bar: {groupWidth: "90%"}
+                title: 'Time activity',
+                curveType: 'function',
+                legend: { position: 'right' }
             };
-            var chart = new google.charts.Bar(document.getElementById('chart'));
-            chart.draw(data, google.charts.Bar.convertOptions(options));
+            var table = new google.visualization.Table(document.getElementById('table_div'));
+            var chart = new google.visualization.LineChart(document.getElementById('chart'));
+            chart.draw(data, options);
+            table.draw(data, {showRowNumber: true, width: '800px', height: '75%'});
         }
     </script>
 </head>
 
 <body>
 <div id="chart" style="width: 1200px; height: 600px;"></div>
+<div id="table_div" style="width: 1200px; height: 600px;"></div>
 </body>
 </html>
