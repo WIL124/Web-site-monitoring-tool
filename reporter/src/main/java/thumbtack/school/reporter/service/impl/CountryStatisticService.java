@@ -1,5 +1,6 @@
 package thumbtack.school.reporter.service.impl;
 
+import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CountryStatisticService implements StatisticService<CountryStatistic> {
     private CountryStatisticRepository repository;
+    private DatabaseReader databaseReader;
     private static final String IP_ADDRESS_HEADER_NAME = "IP address";
 
     @Override
@@ -47,7 +49,7 @@ public class CountryStatisticService implements StatisticService<CountryStatisti
         for (String ipAddress : ipAddressList) {
             String ip;
             try {
-                ip = repository.getCountryFromIP(ipAddress);
+                ip = repository.getCountryFromIP(ipAddress, databaseReader);
             } catch (IOException | GeoIp2Exception e) {
                 log.warn(e.getMessage());
                 ip = "unknown";

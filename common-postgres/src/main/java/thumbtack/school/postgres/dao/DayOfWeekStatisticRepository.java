@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import thumbtack.school.postgres.model.BrowserStatistic;
 import thumbtack.school.postgres.model.DayOfWeekStatistic;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ public interface DayOfWeekStatisticRepository extends JpaRepository<DayOfWeekSta
             "WHERE b.createdAt >= :#{#fromDate} " +
             "AND b.createdAt <= :#{#toDate} GROUP BY b.dayOfWeek")
     List<DayOfWeekStatistic> findByCreatedAtBetweenAndGroupedByName(@Param("fromDate") LocalDateTime fromDate,
-                                                                  @Param("toDate") LocalDateTime to);
+                                                                    @Param("toDate") LocalDateTime to);
 
     @Query("SELECT new DayOfWeekStatistic(b.dayOfWeek, sum(b.count)) " +
             "FROM DayOfWeekStatistic as b GROUP BY b.dayOfWeek")

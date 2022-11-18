@@ -39,7 +39,7 @@
             var chart = new google.visualization.GeoChart(document.getElementById('chart'));
             var table = new google.visualization.Table(document.getElementById('table_div'));
             chart.draw(data, options);
-            table.draw(data, {showRowNumber: true, width: '800px', height: '75%'});
+            table.draw(data, {showRowNumber: true, width: '800px', height: '75%', sortColumn: 1, sortAscending: false});
         }
     </script>
 </head>
