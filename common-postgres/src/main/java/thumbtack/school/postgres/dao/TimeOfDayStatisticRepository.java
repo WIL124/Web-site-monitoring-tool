@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import thumbtack.school.postgres.model.BrowserStatistic;
 import thumbtack.school.postgres.model.TimeOfDayStatistic;
 
 import java.time.LocalDateTime;

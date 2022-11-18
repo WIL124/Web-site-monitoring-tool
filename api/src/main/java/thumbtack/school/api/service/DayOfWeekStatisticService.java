@@ -7,6 +7,7 @@ import thumbtack.school.api.dto.StatisticDto;
 import thumbtack.school.api.mapper.StatisticMapper;
 import thumbtack.school.postgres.dao.DayOfWeekStatisticRepository;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,14 +35,14 @@ public class DayOfWeekStatisticService implements StatisticService {
     @Override
     public List<StatisticDto> getForInterval(IntervalRequest intervalRequest) {
         return repository.findByCreatedAtBetween(intervalRequest.getFrom().atStartOfDay(),
-                        intervalRequest.getTo().atTime(23, 59)).stream()
+                        intervalRequest.getTo().atTime(LocalTime.MAX)).stream()
                 .map(s -> mapper.toDto(s))
                 .collect(Collectors.toList());
     }
 
     public List<StatisticDto> getForIntervalGrouped(IntervalRequest intervalRequest) {
         return repository.findByCreatedAtBetweenAndGroupedByName(intervalRequest.getFrom().atStartOfDay(),
-                        intervalRequest.getTo().atTime(23, 59)).stream()
+                        intervalRequest.getTo().atTime(LocalTime.MAX)).stream()
                 .map(s -> mapper.toDto(s))
                 .collect(Collectors.toList());
     }

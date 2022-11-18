@@ -1,6 +1,7 @@
 package thumbtack.school.hbase.dao.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
@@ -19,6 +20,7 @@ import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 
 @Repository
 @AllArgsConstructor
+@Slf4j
 public class HbaseDaoImpl implements HbaseDao {
     private final UserMapper userMapper;
     private final Configuration configuration;
@@ -47,7 +49,17 @@ public class HbaseDaoImpl implements HbaseDao {
                             values.forEach(value -> put.addColumn(toBytes(COLUMN_FAMILY_NAME), toBytes(name), toBytes(value)))));
             return put;
         }).thenCombine(createConnection(), (putWithData, connection) ->
-                connection.getTable(TableName.valueOf(tableName)).put(putWithData));
+                connection.getTable(TableName.valueOf(tableName)).put(putWithData)
+                        .whenComplete((response, exception) -> {
+                            try {
+                                if (exception != null){
+                                    log.warn("Visit wasn't tracked", exception);
+                                }
+                                connection.close();
+                            } catch (IOException e) {
+                                log.warn("Connection wasn't closed", e);
+                            }
+                        }));
     }
 
     @Override
