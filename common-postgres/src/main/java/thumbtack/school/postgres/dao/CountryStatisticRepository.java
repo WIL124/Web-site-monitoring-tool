@@ -2,7 +2,6 @@ package thumbtack.school.postgres.dao;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface CountryStatisticRepository extends JpaRepository<CountryStatistic, Long> {
+public interface CountryStatisticRepository extends CommonRepository<CountryStatistic> {
     List<CountryStatistic> findByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
 
     @Query("SELECT new CountryStatistic(b.name, SUM(b.count)) " +

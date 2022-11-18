@@ -1,13 +1,11 @@
 package thumbtack.school.reporter.service.impl;
 
 import eu.bitwalker.useragentutils.UserAgent;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import thumbtack.school.hbase.model.User;
 import thumbtack.school.postgres.dao.BrowserStatisticRepository;
 import thumbtack.school.postgres.model.BrowserStatistic;
-import thumbtack.school.reporter.service.StatisticService;
+import thumbtack.school.reporter.service.AbstractStatisticService;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,10 +14,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
-@Slf4j
-public class BrowserStatisticService implements StatisticService<BrowserStatistic> {
-    private BrowserStatisticRepository repository;
+public class BrowserStatisticService extends AbstractStatisticService<BrowserStatistic, BrowserStatisticRepository> {
+    public BrowserStatisticService(BrowserStatisticRepository repository) {
+        super(repository);
+    }
 
     @Override
     public List<BrowserStatistic> getStatistic(List<User> users) {
@@ -27,11 +25,6 @@ public class BrowserStatisticService implements StatisticService<BrowserStatisti
                 .map(this::getUserAgentsFromUser)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
-    }
-
-    @Override
-    public void saveAll(List<BrowserStatistic> statistic) {
-        repository.saveAll(statistic);
     }
 
     private List<UserAgent> getUserAgentsFromUser(User user) {

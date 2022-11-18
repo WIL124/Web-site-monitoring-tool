@@ -1,11 +1,10 @@
 package thumbtack.school.reporter.service.impl;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import thumbtack.school.hbase.model.User;
 import thumbtack.school.postgres.dao.DayOfWeekStatisticRepository;
 import thumbtack.school.postgres.model.DayOfWeekStatistic;
-import thumbtack.school.reporter.service.StatisticService;
+import thumbtack.school.reporter.service.AbstractStatisticService;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
@@ -13,9 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
-public class DayOfWeekStatisticService implements StatisticService<DayOfWeekStatistic> {
-    private DayOfWeekStatisticRepository repository;
+public class DayOfWeekStatisticService extends AbstractStatisticService<DayOfWeekStatistic, DayOfWeekStatisticRepository> {
+    public DayOfWeekStatisticService(DayOfWeekStatisticRepository repository) {
+        super(repository);
+    }
 
     @Override
     public List<DayOfWeekStatistic> getStatistic(List<User> users) {
@@ -25,11 +25,6 @@ public class DayOfWeekStatisticService implements StatisticService<DayOfWeekStat
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         return getDaysOfWeekFromTimestamps(timestamps);
-    }
-
-    @Override
-    public void saveAll(List<DayOfWeekStatistic> statistic) {
-        repository.saveAll(statistic);
     }
 
     private List<DayOfWeekStatistic> getDaysOfWeekFromTimestamps(List<Long> tsList) {

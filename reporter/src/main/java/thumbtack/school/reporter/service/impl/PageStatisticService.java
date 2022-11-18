@@ -1,11 +1,10 @@
 package thumbtack.school.reporter.service.impl;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import thumbtack.school.postgres.model.PageStatistic;
 import thumbtack.school.hbase.model.User;
 import thumbtack.school.postgres.dao.PageStatisticRepository;
-import thumbtack.school.reporter.service.StatisticService;
+import thumbtack.school.postgres.model.PageStatistic;
+import thumbtack.school.reporter.service.AbstractStatisticService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,11 +13,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
-public class PageStatisticService implements StatisticService<PageStatistic> {
-    private PageStatisticRepository repository;
+public class PageStatisticService extends AbstractStatisticService<PageStatistic, PageStatisticRepository> {
 
-    @Override
+    public PageStatisticService(PageStatisticRepository repository) {
+        super(repository);
+    }
+
     public List<PageStatistic> getStatistic(List<User> users) {
         List<String> pages = users.stream()
                 .map(user -> user.getTimestampHeadersMap().values().stream()
@@ -28,11 +28,6 @@ public class PageStatisticService implements StatisticService<PageStatistic> {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         return collectPagesFromList(pages);
-    }
-
-    @Override
-    public void saveAll(List<PageStatistic> statistic) {
-        repository.saveAll(statistic);
     }
 
     private List<PageStatistic> collectPagesFromList(List<String> pages) {

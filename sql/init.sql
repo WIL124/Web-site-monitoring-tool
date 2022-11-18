@@ -29,14 +29,14 @@ create table if not exists days_of_week
 create table if not exists pages
 (
     id         bigserial not null primary key,
-    url        text      not null,
+    name       text      not null,
     count      bigint    not null,
     created_at timestamp not null
 );
 create table if not exists time_of_day
 (
     id         bigserial not null primary key,
-    hour        smallint  not null,
+    name       text      not null,
     count      bigint    not null,
     created_at timestamp not null
 );

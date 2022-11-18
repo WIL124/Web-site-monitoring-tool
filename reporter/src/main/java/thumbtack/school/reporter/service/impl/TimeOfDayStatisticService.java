@@ -1,19 +1,19 @@
 package thumbtack.school.reporter.service.impl;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import thumbtack.school.hbase.model.User;
 import thumbtack.school.postgres.dao.TimeOfDayStatisticRepository;
 import thumbtack.school.postgres.model.TimeOfDayStatistic;
-import thumbtack.school.reporter.service.StatisticService;
+import thumbtack.school.reporter.service.AbstractStatisticService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
-public class TimeOfDayStatisticService implements StatisticService<TimeOfDayStatistic> {
-    private TimeOfDayStatisticRepository repository;
+public class TimeOfDayStatisticService extends AbstractStatisticService<TimeOfDayStatistic, TimeOfDayStatisticRepository> {
+    public TimeOfDayStatisticService(TimeOfDayStatisticRepository repository) {
+        super(repository);
+    }
 
     @Override
     public List<TimeOfDayStatistic> getStatistic(List<User> users) {
@@ -25,11 +25,6 @@ public class TimeOfDayStatisticService implements StatisticService<TimeOfDayStat
         return getTimeOfDayFromTimestamps(timestamps);
     }
 
-    @Override
-    public void saveAll(List<TimeOfDayStatistic> statistic) {
-        repository.saveAll(statistic);
-    }
-
     private List<TimeOfDayStatistic> getTimeOfDayFromTimestamps(List<Long> tsList) {
         Map<Integer, Long> map = new HashMap<>();
         Calendar calendar = GregorianCalendar.getInstance();
@@ -38,7 +33,7 @@ public class TimeOfDayStatisticService implements StatisticService<TimeOfDayStat
             map.merge(calendar.get(Calendar.HOUR_OF_DAY), 1L, Long::sum);
         }
         return map.entrySet().stream()
-                .map(entry -> new TimeOfDayStatistic(entry.getKey(), entry.getValue()))
+                .map(entry -> new TimeOfDayStatistic(entry.getKey().toString(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 }
