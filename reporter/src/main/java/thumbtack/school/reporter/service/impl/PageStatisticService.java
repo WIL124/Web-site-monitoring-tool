@@ -1,5 +1,6 @@
 package thumbtack.school.reporter.service.impl;
 
+import org.apache.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import thumbtack.school.hbase.model.User;
 import thumbtack.school.postgres.dao.PageStatisticRepository;
@@ -22,7 +23,7 @@ public class PageStatisticService extends AbstractStatisticService<PageStatistic
     public List<PageStatistic> getStatistic(List<User> users) {
         List<String> pages = users.stream()
                 .map(user -> user.getTimestampHeadersMap().values().stream()
-                        .map(headers -> headers.getFirst("referer"))
+                        .map(headers -> headers.getFirst(HttpHeaders.REFERER))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList()))
                 .flatMap(List::stream)

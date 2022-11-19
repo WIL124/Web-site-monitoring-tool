@@ -1,6 +1,7 @@
 package thumbtack.school.reporter.service.impl;
 
 import eu.bitwalker.useragentutils.UserAgent;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import thumbtack.school.hbase.model.User;
 import thumbtack.school.postgres.dao.BrowserStatisticRepository;
@@ -29,7 +30,7 @@ public class BrowserStatisticService extends AbstractStatisticService<BrowserSta
 
     private List<UserAgent> getUserAgentsFromUser(User user) {
         return user.getTimestampHeadersMap().values().stream()
-                .map(headers -> headers.getFirst("user-agent"))
+                .map(headers -> headers.getFirst(HttpHeaders.USER_AGENT))
                 .map(UserAgent::parseUserAgentString).collect(Collectors.toList());
     }
 
