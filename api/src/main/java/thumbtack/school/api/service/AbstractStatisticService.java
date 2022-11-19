@@ -2,51 +2,41 @@ package thumbtack.school.api.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import thumbtack.school.api.dto.IntervalRequest;
-import thumbtack.school.api.dto.StatisticDto;
-import thumbtack.school.api.mapper.StatisticMapper;
 import thumbtack.school.postgres.dao.CommonRepository;
+import thumbtack.school.postgres.dto.StatisticDto;
 import thumbtack.school.postgres.model.AbstractStatistic;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public abstract class AbstractStatisticService<E extends AbstractStatistic, R extends CommonRepository<E>>
         implements StatisticService {
     protected R repository;
-    protected StatisticMapper statisticMapper;
-    private StatisticMapper mapper;
 
-    @Override
-    public List<StatisticDto> getAllRaw() {
-        return repository.findAll().stream()
-                .map(browserStatistic ->
-                        mapper.toDto(browserStatistic))
-                .collect(Collectors.toList());
+    public List<StatisticDto> getForIntervalGrouped(String from, String to) {
+        return repository.selectAllCustom(dateStringToStartOfDay(from),
+                dateStringToEndOfDay(to));
     }
 
-    public List<StatisticDto> getAllGrouped() {
-        return repository.selectAllGroupedByName().stream()
-                .map(browserStatistic ->
-                        mapper.toDto(browserStatistic))
-                .collect(Collectors.toList());
+    private LocalDateTime dateStringToEndOfDay(String dateString) {
+        try {
+            return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd.MM.yyyy")).atStartOfDay();
+        } catch (DateTimeParseException ex) {
+            return null;
+        }
     }
 
-    @Override
-    public List<StatisticDto> getForInterval(IntervalRequest intervalRequest) {
-        return repository.findByCreatedAtBetween(intervalRequest.getFrom().atStartOfDay(),
-                        intervalRequest.getTo().atTime(LocalTime.MAX)).stream()
-                .map(s -> mapper.toDto(s))
-                .collect(Collectors.toList());
-    }
-
-    public List<StatisticDto> getForIntervalGrouped(IntervalRequest intervalRequest) {
-        return repository.findByCreatedAtBetweenAndGroupedByName(intervalRequest.getFrom().atStartOfDay(),
-                        intervalRequest.getTo().atTime(LocalTime.MAX)).stream()
-                .map(s -> mapper.toDto(s))
-                .collect(Collectors.toList());
+    private LocalDateTime dateStringToStartOfDay(String dateString) {
+        try {
+            return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd.MM.yyyy")).atTime(LocalTime.MAX);
+        } catch (DateTimeParseException ex) {
+            return null;
+        }
     }
 }

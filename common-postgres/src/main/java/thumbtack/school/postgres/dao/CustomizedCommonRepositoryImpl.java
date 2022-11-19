@@ -1,5 +1,7 @@
 package thumbtack.school.postgres.dao;
 
+import org.springframework.stereotype.Component;
+import thumbtack.school.postgres.dto.StatisticDto;
 import thumbtack.school.postgres.model.AbstractStatistic;
 
 import javax.persistence.EntityManager;
@@ -9,16 +11,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DynamicSqlRepositoryImpl implements DynamicSqlRepo<AbstractStatistic> {
+@Component
+public class CustomizedCommonRepositoryImpl implements CustomizedCommonRepository {
     @PersistenceContext
     private EntityManager entityManager;
-
     @Override
-    public List<AbstractStatistic> findByCreatedAtBetween(LocalDateTime from, LocalDateTime to) {
+    public List<StatisticDto> selectAllCustom(LocalDateTime from, LocalDateTime to) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AbstractStatistic> query = cb.createQuery(AbstractStatistic.class);
+        CriteriaQuery<StatisticDto> query = cb.createQuery(StatisticDto.class);
         Root<AbstractStatistic> abstractStatisticRoot = query.from(AbstractStatistic.class);
         Path<LocalDateTime> createdAtPath = abstractStatisticRoot.get("createdAt");
+
         List<Predicate> predicates = new ArrayList<>();
         if (from != null) {
             predicates.add(cb.greaterThanOrEqualTo(createdAtPath, from));
@@ -26,8 +29,12 @@ public class DynamicSqlRepositoryImpl implements DynamicSqlRepo<AbstractStatisti
         if (to != null) {
             predicates.add(cb.lessThanOrEqualTo(createdAtPath, to));
         }
-        query.select(abstractStatisticRoot).where(cb.and(predicates.toArray(new
-                Predicate[predicates.size()])));
+
+        query.multiselect(abstractStatisticRoot.get("name").alias("name"),
+                        cb.sum(abstractStatisticRoot.get("count")).alias("count"))
+                .where(cb.and(predicates.toArray(new Predicate[predicates.size()])))
+                .groupBy(abstractStatisticRoot.get("name"));
+
         return entityManager.createQuery(query).getResultList();
     }
 }
