@@ -14,12 +14,12 @@
 
     <packaging>pom</packaging>
     <modules>
-        <module>tracking</module>
-        <module>reporter</module>
-        <module>api</module>
-        <module>common-hbase</module>
-        <module>common-postgres</module>
-        <module>admin</module>
+        <module>modules/tracking</module>
+        <module>modules/reporter</module>
+        <module>modules/api</module>
+        <module>modules/common-hbase</module>
+        <module>modules/common-postgres</module>
+        <module>modules/admin</module>
     </modules>
 
     <properties>
