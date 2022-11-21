@@ -19,8 +19,8 @@ public abstract class AbstractController<S extends StatisticService> implements 
     protected S service;
 
     @GetMapping
-    public List<StatisticDto> getAll(@RequestParam(value = "from", required = false) @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate from,
-                                     @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate to) {
+    public List<StatisticDto> getAll(@RequestParam(value = "from", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+                                     @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to) {
         return service.getAllGroupedByNameAndCreatedAtBetween(from, to);
     }
 }

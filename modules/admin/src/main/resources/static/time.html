@@ -14,37 +14,55 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript">
-        google.charts.load('current', {'packages': ['corechart', 'table']});
-        google.charts.setOnLoadCallback(drawStatistic);
-        var dataArray = [['Hour', 'Count']]
-        $.ajaxSetup({
-            async: false
-        });
-        $.getJSON('http://localhost:8082/time', function (data) {
-            var jsonObj = data;
-            var array = []
-            for (var i in jsonObj) {
-                array.push([jsonObj[i].name, jsonObj[i].count]);
+        function loadData() {
+            var from = document.getElementById("from").value
+            var to = document.getElementById("to").value
+            var searchParams = new URLSearchParams();
+            if (from != "" ) {
+                searchParams.append("from", from)
             }
-            array.sort((a, b) => a[0]-b[0]).map(a => dataArray.push(a))
-        });
+            if (from != "") {
+                searchParams.append("to", to)
+            }
+            google.charts.load('current', {'packages': ['corechart', 'table']});
+            google.charts.setOnLoadCallback(drawStatistic);
+            var dataArray = [['Hour', 'Count']]
+            $.ajaxSetup({
+                async: false,
+                cacheLength: 0
+            });
+            $.getJSON('http://localhost:8082/time' + "?" + searchParams.toString(), function (data) {
+                var jsonObj = data;
+                var array = []
+                for (var i in jsonObj) {
+                    array.push([jsonObj[i].name, jsonObj[i].count]);
+                }
+                array.sort((a, b) => a[0] - b[0]).map(a => dataArray.push(a))
+            });
 
-        function drawStatistic() {
-            var data = new google.visualization.arrayToDataTable(dataArray);
-            var options = {
-                title: 'Time activity',
-                curveType: 'function',
-                legend: { position: 'right' }
-            };
-            var table = new google.visualization.Table(document.getElementById('table_div'));
-            var chart = new google.visualization.LineChart(document.getElementById('chart'));
-            chart.draw(data, options);
-            table.draw(data, {showRowNumber: true, width: '800px', height: '75%'});
+            function drawStatistic() {
+                var data = new google.visualization.arrayToDataTable(dataArray);
+                var options = {
+                    title: 'Time activity',
+                    curveType: 'function',
+                    legend: {position: 'right'},
+                    pointSize: 10,
+                    lineWidth: 10,
+                };
+                var table = new google.visualization.Table(document.getElementById('table_div'));
+                var chart = new google.visualization.LineChart(document.getElementById('chart'));
+                chart.draw(data, options);
+                table.draw(data, {showRowNumber: true, width: '800px', height: '75%'});
+            }
         }
     </script>
 </head>
 
 <body>
+<input type="date" dataformatas="dd/MM/yyyy" required pattern="[1970-2100]-[0-9]{2}-[0-9]{2}" id="from">
+<input type="date" dataformatas="dd/MM/yyyy" required pattern="[1970-2100]-[0-9]{2}-[0-9]{2}" id="to">
+<script>  loadData()</script>
+<button onclick="loadData()">BIG BUTTON</button>
 <div id="chart" style="width: 1200px; height: 600px;"></div>
 <div id="table_div" style="width: 1200px; height: 600px;"></div>
 </body>
