@@ -65,9 +65,11 @@ public class HbaseDaoImpl implements HbaseDao {
     @Override
     public List<User> getAllUsersWithTimeRange(String tableName, long minRange, long maxRange) {
         try {
-            return createConnection().thenApply(connection -> connection.getTable(TableName.valueOf(tableName)))
+            return createConnection()
+                    .thenApply(connection -> connection.getTable(TableName.valueOf(tableName)))
                     .thenCompose(table -> table.scanAll(fullScanWithTimeRange(minRange, maxRange)))
-                    .thenApply(resultList -> resultList.stream().map(userMapper::fromResult).collect(Collectors.toList())).get();
+                    .thenApply(resultList -> resultList.stream().map(userMapper::fromResult).collect(Collectors.toList()))
+                    .get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }

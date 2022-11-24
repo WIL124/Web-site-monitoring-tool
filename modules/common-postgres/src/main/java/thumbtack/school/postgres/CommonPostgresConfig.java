@@ -13,8 +13,7 @@ public class CommonPostgresConfig {
     @Bean
     @ConditionalOnNotWebApplication
     public DatabaseReader databaseReader() throws IOException {
-        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GeoLite2-City.mmdb")) {
-            return new DatabaseReader.Builder(inputStream).build();
-        }
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("GeoLite2-City.mmdb");
+        return new DatabaseReader.Builder(inputStream).build();
     }
 }

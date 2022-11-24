@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "browsers")
 public class BrowserStatistic extends AbstractStatistic {
-    public BrowserStatistic(String name, Long count) {
+    public BrowserStatistic(String name, long count) {
         super(name, count);
     }
 }

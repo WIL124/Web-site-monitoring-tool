@@ -37,4 +37,8 @@ public class TrackerController {
         response.setHeader("Set-Cookie", "userId=" + UUID.randomUUID());
         return ResponseEntity.status(303).build();
     }
+    @GetMapping(value = "/test")
+    public void insertTestData(){
+        trackerService.insertTestData();
+    }
 }

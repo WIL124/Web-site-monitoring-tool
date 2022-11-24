@@ -47,7 +47,7 @@ public class ReporterServiceImpl {
 
         CompletableFuture
                 .supplyAsync(() -> countryStatisticStatisticService.getStatistic(users))
-                .thenAcceptAsync(pageStatistics -> countryStatisticStatisticService.saveAll(pageStatistics));
+                .thenAcceptAsync(countryStatistics -> countryStatisticStatisticService.saveAll(countryStatistics));
 
         CompletableFuture
                 .supplyAsync(() -> timeOfDayStatisticStatisticService.getStatistic(users))

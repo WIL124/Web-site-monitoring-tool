@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 
 @Configuration
 @EnableAsync
-public class AppConfig {
+public class CommonHbaseConfig {
     @Bean
     org.apache.hadoop.conf.Configuration configuration() {
         org.apache.hadoop.conf.Configuration config = HBaseConfiguration.create();
