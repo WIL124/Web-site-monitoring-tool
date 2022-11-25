@@ -45,7 +45,7 @@ create table if not exists time_of_day
 create table if not exists users
 (
     id         bigserial not null primary key,
-    name       text      not null,
-    count      bigint    not null,
+    users      bigint   not null,
+    requests   bigint    not null,
     created_at timestamp not null
 );

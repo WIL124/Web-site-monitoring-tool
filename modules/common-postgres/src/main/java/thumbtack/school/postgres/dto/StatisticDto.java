@@ -12,9 +12,4 @@ import java.time.LocalDateTime;
 public class StatisticDto {
     private String name;
     private long count;
-    private LocalDateTime createdAt;
-    public StatisticDto(String name, long count) {
-        this.name = name;
-        this.count = count;
-    }
 }

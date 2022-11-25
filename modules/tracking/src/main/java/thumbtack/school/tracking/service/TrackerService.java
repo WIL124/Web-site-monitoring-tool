@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -39,7 +40,7 @@ public class TrackerService {
 
     //////////////test methods///////////////////////////
     public void insertTestData() {
-        for (int i = 0; i < 10; i++) { //create 10 users
+        for (int i = 0; i < 5; i++) { //create 5 users
             HttpHeaders headers = new HttpHeaders();
             headers.add(IP_ADDRESS_HEADER_NAME,  //randomIp
                     randomIp());
@@ -49,7 +50,12 @@ public class TrackerService {
                     .id(UUID.randomUUID().toString())
                     .timestampHeadersMap(Collections.singletonMap(getRandomTime(), headers))
                     .build();
-            hbaseDao.put(TABLE_NAME, user);
+            CompletableFuture<Void> cf = CompletableFuture.runAsync(() -> hbaseDao.put(TABLE_NAME, user));
+            try {
+                cf.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -63,13 +69,13 @@ public class TrackerService {
     private String getRandomReferer() {
         switch (random.nextInt(4)) {
             case 1:
-                return "funny cat";
+                return "http://localhost:8080/index.html";
             case 2:
-                return "main page";
+                return "http://localhost:8080/funny-cats.html";
             case 3:
-                return "cute cat";
+                return "http://localhost:8080/cute-cats.html";
             case 4:
-                return "angry cat";
+                return "http://localhost:8080/angry-cats.html";
         }
         return null;
     }

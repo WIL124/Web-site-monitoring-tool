@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Pages statistic</title>
+    <title>Users statistic</title>
     <div class="container" style="padding-top: 10px;">
         <a href="index.html" role="button">Browsers</a>
         <a href="page.html" role="button">Pages</a>
@@ -18,7 +18,7 @@
             var from = document.getElementById("from").value
             var to = document.getElementById("to").value
             var searchParams = new URLSearchParams();
-            if (from != "" ) {
+            if (from != "") {
                 searchParams.append("from", from)
             }
             if (from != "") {
@@ -26,15 +26,16 @@
             }
             google.charts.load('current', {'packages': ['bar', 'table']});
             google.charts.setOnLoadCallback(drawStatistic);
-            var dataArray = [['Page', 'Count']]
+            var dataArray = [['Date', 'Unique users', 'Total requests']]
             $.ajaxSetup({
                 async: false,
                 cacheLength: 0
             });
-            $.getJSON('http://localhost:8082/pages' + "?" + searchParams.toString(), function (data) {
+            $.getJSON('http://localhost:8082/users' + "?" + searchParams.toString(), function (data) {
                 var jsonObj = data;
                 for (var i in jsonObj) {
-                    dataArray.push([jsonObj[i].name, jsonObj[i].count]);
+                    jsonObj[i].createdAt = String(jsonObj[i].createdAt).substring(0, 16)
+                    dataArray.push([jsonObj[i].createdAt, jsonObj[i].users, jsonObj[i].requests]);
                 }
             });
 
@@ -44,7 +45,7 @@
                     width: 800,
                     legend: {position: 'none'},
                     chart: {
-                        title: 'Pages statistics',
+                        title: 'Users statistics',
                     },
                     bar: {groupWidth: "90%"}
                 };

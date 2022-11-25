@@ -19,6 +19,8 @@ import java.util.concurrent.CompletableFuture;
 public class ReporterServiceImpl {
     @Autowired
     private Collection<StatisticService> services;
+    private UserStatisticService userStatisticService;
+
     //    private StatisticService<BrowserStatistic> browserStatisticService;
 //    private StatisticService<DayOfWeekStatistic> dayOfWeekStatisticStatisticService;
 //    private StatisticService<PageStatistic> pageStatisticStatisticService;
@@ -39,6 +41,10 @@ public class ReporterServiceImpl {
                 CompletableFuture
                         .supplyAsync(() -> statisticService.getStatistic(users))
                         .thenAcceptAsync(statistics -> statisticService.saveAll(statistics)));
+
+        CompletableFuture
+                .supplyAsync(() -> userStatisticService.getStatistic(users))
+                .thenAcceptAsync(statistics -> userStatisticService.saveAll(statistics));
 //        CompletableFuture
 //                .supplyAsync(() -> browserStatisticService.getStatistic(users))
 //                .thenAcceptAsync(browserStatistics -> browserStatisticService.saveAll(browserStatistics));
